@@ -1,5 +1,5 @@
 {
-    "name": "mtk3d/laravel-sail-tui",
+    "name": "mtk3d/laratui",
     "type": "project",
     "license": "MIT",
     "autoload": {
