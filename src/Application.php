@@ -23,7 +23,9 @@ use React\Stream\ReadableResourceStream;
 class Application
 {
     private array $sidebarPanes = [];
+
     private array $mainPanes = [];
+
     private int $selectedPane = 0;
 
     private function __construct(
@@ -33,8 +35,7 @@ class Application
         private EventBus $eventBus,
         private CommandBus $commandBus,
         private State $state,
-    ) {
-    }
+    ) {}
 
     public static function new(): self
     {

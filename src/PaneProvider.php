@@ -2,7 +2,4 @@
 
 namespace LaraTui;
 
-class PaneProvider
-{
-
-}
+class PaneProvider {}

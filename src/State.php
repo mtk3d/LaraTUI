@@ -29,18 +29,21 @@ class State
 
     public function append(string $key, mixed $value): void
     {
-        if (!isset($this->state[$key])) {
+        if (! isset($this->state[$key])) {
             $this->state[$key] = $value;
+
             return;
         }
 
         if (is_string($this->state[$key])) {
             $this->state[$key] .= $value;
+
             return;
         }
 
         if (is_array($this->state[$key])) {
             $this->state[$key][] = $value;
+
             return;
         }
     }

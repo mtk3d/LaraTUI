@@ -26,7 +26,7 @@ class CommandProvider
 
     private function register(string $className): void
     {
-        /** @var Command $command **/
+        /** @var Command $command * */
         $command = new $className($this->state, $this->loop);
         $this->commandBus->reactTo($command::$commandName, [$command, 'execute']);
     }

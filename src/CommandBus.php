@@ -8,7 +8,7 @@ class CommandBus
 
     public function reactTo(string $commandName, callable $func): void
     {
-        if (!isset($this->register[$commandName])) {
+        if (! isset($this->register[$commandName])) {
             $this->register[$commandName] = [];
         }
 
@@ -17,7 +17,7 @@ class CommandBus
 
     public function dispatch(string $commandName, array $data = []): void
     {
-        if (!isset($this->register[$commandName])) {
+        if (! isset($this->register[$commandName])) {
             return;
         }
 

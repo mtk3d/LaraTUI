@@ -12,78 +12,78 @@ use ReflectionObject;
 
 abstract class Pane
 {
-	protected bool $isSelected = false;
-	protected EventBus $eventBus;
-	protected CommandBus $commandBus;
-	protected State $state;
-	protected array $timers = [];
+    protected bool $isSelected = false;
 
-	public function __construct()
-	{
-	}
+    protected EventBus $eventBus;
 
-	protected function init(): void
-	{}
+    protected CommandBus $commandBus;
 
-	public function selectPane(): void
-	{
-		$this->isSelected = true;
-	}
+    protected State $state;
 
-	public function deselectPane(): void
-	{
-		$this->isSelected = false;
-	}
+    protected array $timers = [];
 
-	public function registerPane(
-		LoopInterface $loop,
-		EventBus $eventBus,
-		CommandBus $commandBus,
-		State $state,
-	): void
-	{
-		$reflection = new ReflectionObject($this);
-		$methods = $reflection->getMethods();
+    public function __construct() {}
 
-		foreach ($methods as $method) {
-			$attributes = $method->getAttributes(KeyPressed::class);
-			foreach ($attributes as $attribute) {
-				$methodName = $method->getName();
-				$attribute = $attribute->newInstance();
-				$eventBus->listenTo(
-					$attribute->key,
-					function () use ($attribute, $methodName) {
-						if ($this->isSelected || $attribute->global) {
-							$this->$methodName();
-						}
-					}
-				);
-			}
+    protected function init(): void {}
 
-			$attributes = $method->getAttributes(Periodic::class);
-			foreach ($attributes as $attribute) {
-				$methodName = $method->getName();
-				$attribute = $attribute->newInstance();
-				$this->timers[] = $loop->addPeriodicTimer($attribute->interval, [$this, $methodName]);
-			}
-		}
+    public function selectPane(): void
+    {
+        $this->isSelected = true;
+    }
 
-		$this->eventBus = $eventBus;
-		$this->commandBus = $commandBus;
-		$this->state = $state;
+    public function deselectPane(): void
+    {
+        $this->isSelected = false;
+    }
 
-		$this->init();
-	}
+    public function registerPane(
+        LoopInterface $loop,
+        EventBus $eventBus,
+        CommandBus $commandBus,
+        State $state,
+    ): void {
+        $reflection = new ReflectionObject($this);
+        $methods = $reflection->getMethods();
 
-	protected function emit(string $event, array $data): void
-	{
-		$this->eventBus->emit($event, $data);
-	}
+        foreach ($methods as $method) {
+            $attributes = $method->getAttributes(KeyPressed::class);
+            foreach ($attributes as $attribute) {
+                $methodName = $method->getName();
+                $attribute = $attribute->newInstance();
+                $eventBus->listenTo(
+                    $attribute->key,
+                    function () use ($attribute, $methodName) {
+                        if ($this->isSelected || $attribute->global) {
+                            $this->$methodName();
+                        }
+                    }
+                );
+            }
 
-	public function unmount(): void
-	{
-		foreach($this->timers as $timer) {
-			$timer->stop();
-		}
-	}
+            $attributes = $method->getAttributes(Periodic::class);
+            foreach ($attributes as $attribute) {
+                $methodName = $method->getName();
+                $attribute = $attribute->newInstance();
+                $this->timers[] = $loop->addPeriodicTimer($attribute->interval, [$this, $methodName]);
+            }
+        }
+
+        $this->eventBus = $eventBus;
+        $this->commandBus = $commandBus;
+        $this->state = $state;
+
+        $this->init();
+    }
+
+    protected function emit(string $event, array $data): void
+    {
+        $this->eventBus->emit($event, $data);
+    }
+
+    public function unmount(): void
+    {
+        foreach ($this->timers as $timer) {
+            $timer->stop();
+        }
+    }
 }

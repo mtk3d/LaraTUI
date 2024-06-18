@@ -18,142 +18,143 @@ use PhpTui\Tui\Widget\Widget;
 
 class Services extends Pane
 {
-	private int $selectedItem = 0;
-	private array $services = [
-		[
-			'icon' => '',
-			'name' => 'MySQL',
-			'service' => 'mysql',
-		],
-		[
-			'icon' => '',
-			'name' => 'PostgreSQL',
-			'service' => 'pgsql',
-		],
-		[
-			'icon' => '',
-			'name' => 'MariaDB',
-			'service' => 'mariadb',
-		],
-		[
-			'icon' => '',
-			'name' => 'Redis',
-			'service' => 'redis',
-		],
-		[
-			'icon' => '',
-			'name' => 'Memcached',
-			'service' => 'memcached',
-		],
-		[
-			'icon' => '',
-			'name' => 'Meilisearch',
-			'service' => 'meilisearch',
-		],
-		[
-			'icon' => '',
-			'name' => 'Typesense',
-			'service' => 'typesense',
-		],
-		[
-			'icon' => '',
-			'name' => 'Minio',
-			'service' => 'minio',
-		],
-		[
-			'icon' => '',
-			'name' => 'Mailpit',
-			'service' => 'mailpit',
-		],
-	];
+    private int $selectedItem = 0;
 
-	public function init(): void
-	{
-		$this->collectServicesData();
-	}
+    private array $services = [
+        [
+            'icon' => '',
+            'name' => 'MySQL',
+            'service' => 'mysql',
+        ],
+        [
+            'icon' => '',
+            'name' => 'PostgreSQL',
+            'service' => 'pgsql',
+        ],
+        [
+            'icon' => '',
+            'name' => 'MariaDB',
+            'service' => 'mariadb',
+        ],
+        [
+            'icon' => '',
+            'name' => 'Redis',
+            'service' => 'redis',
+        ],
+        [
+            'icon' => '',
+            'name' => 'Memcached',
+            'service' => 'memcached',
+        ],
+        [
+            'icon' => '',
+            'name' => 'Meilisearch',
+            'service' => 'meilisearch',
+        ],
+        [
+            'icon' => '',
+            'name' => 'Typesense',
+            'service' => 'typesense',
+        ],
+        [
+            'icon' => '',
+            'name' => 'Minio',
+            'service' => 'minio',
+        ],
+        [
+            'icon' => '',
+            'name' => 'Mailpit',
+            'service' => 'mailpit',
+        ],
+    ];
 
-	#[KeyPressed('k')]
-	public function up(): void
-	{
-		if ($this->selectedItem > 0) {
-			$this->selectedItem--;
-		}
-	}
+    public function init(): void
+    {
+        $this->collectServicesData();
+    }
 
-	#[KeyPressed('j')]
-	public function down(): void
-	{
-		if ($this->selectedItem < count($this->services) - 1) {
-			$this->selectedItem++;
-		}
-	}
+    #[KeyPressed('k')]
+    public function up(): void
+    {
+        if ($this->selectedItem > 0) {
+            $this->selectedItem--;
+        }
+    }
 
-	#[Periodic(1)]
-	public function collectServicesData(): void
-	{
-		$this->commandBus->dispatch(ServicesStatusCommand::$commandName);
-	}
+    #[KeyPressed('j')]
+    public function down(): void
+    {
+        if ($this->selectedItem < count($this->services) - 1) {
+            $this->selectedItem++;
+        }
+    }
 
-	private function combineServicesWithStatus(): array
-	{
-		$servicesStatus = $this->state->get('services_status');
-		$services = array_map(
-			function ($service) use ($servicesStatus) {
-				$container = $service['service'];
-				$service['status'] = 'disabled';
+    #[Periodic(1)]
+    public function collectServicesData(): void
+    {
+        $this->commandBus->dispatch(ServicesStatusCommand::$commandName);
+    }
 
-				if (isset($servicesStatus["$container"])) {
-					$service['status'] = $servicesStatus["$container"];
-				}
+    private function combineServicesWithStatus(): array
+    {
+        $servicesStatus = $this->state->get('services_status');
+        $services = array_map(
+            function ($service) use ($servicesStatus) {
+                $container = $service['service'];
+                $service['status'] = 'disabled';
 
-				return $service;
-			},
-			$this->services
-		);
+                if (isset($servicesStatus["$container"])) {
+                    $service['status'] = $servicesStatus["$container"];
+                }
 
-		$enabled = array_filter($services, fn ($service) => $service['status'] !== 'disabled');
-		$disabled = array_filter($services, fn ($service) => $service['status'] === 'disabled');
+                return $service;
+            },
+            $this->services
+        );
 
-		return [...$enabled, ...$disabled];
-	}
+        $enabled = array_filter($services, fn ($service) => $service['status'] !== 'disabled');
+        $disabled = array_filter($services, fn ($service) => $service['status'] === 'disabled');
 
-	public function render(): Widget
-	{
-		$services = array_map(
-			function ($service) {
-				$icon = $service['icon'];
-				$name = $service['name'];
-				$status = $service['status'];
-				$style = Style::default()->darkGray();
+        return [...$enabled, ...$disabled];
+    }
 
-				if ($status !== 'disabled') {
-					$style = Style::default();
-				}
+    public function render(): Widget
+    {
+        $services = array_map(
+            function ($service) {
+                $icon = $service['icon'];
+                $name = $service['name'];
+                $status = $service['status'];
+                $style = Style::default()->darkGray();
 
-				return ListItem::new(
-					Text::fromString("$icon $name ($status)")->patchStyle($style),
-				);
-			},
-			$this->combineServicesWithStatus()
-		);
+                if ($status !== 'disabled') {
+                    $style = Style::default();
+                }
 
-		return
-			BlockWidget::default()
-			->borders(Borders::ALL)
-			->borderType(BorderType::Rounded)
-			->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
-			->titles(
-				Title::fromString(' 󰡨 Services'),
-			)
-			->titleStyle(Style::default()->bold())
-			->widget(
-				ListWidget::default()
-					->highlightSymbol('')
-					->highlightStyle(Style::default()->lightRed())
-					->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
-					->items(
-						...$services,
-					)
-			);
-	}
+                return ListItem::new(
+                    Text::fromString("$icon $name ($status)")->patchStyle($style),
+                );
+            },
+            $this->combineServicesWithStatus()
+        );
+
+        return
+            BlockWidget::default()
+                ->borders(Borders::ALL)
+                ->borderType(BorderType::Rounded)
+                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->titles(
+                    Title::fromString(' 󰡨 Services'),
+                )
+                ->titleStyle(Style::default()->bold())
+                ->widget(
+                    ListWidget::default()
+                        ->highlightSymbol('')
+                        ->highlightStyle(Style::default()->lightRed())
+                        ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
+                        ->items(
+                            ...$services,
+                        )
+                );
+    }
 }

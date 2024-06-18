@@ -8,9 +8,7 @@ class OutdatedPackagesCommand extends Command
 {
     public static string $commandName = 'laravel_packages_command';
 
-    public function init(): void
-    {
-    }
+    public function init(): void {}
 
     public function execute(array $data): void
     {

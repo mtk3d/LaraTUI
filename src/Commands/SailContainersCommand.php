@@ -9,6 +9,7 @@ use React\Http\Message\ResponseException;
 class SailContainersCommand extends Command
 {
     public static string $commandName = 'sail_containers_command';
+
     private readonly Docker $docker;
 
     public function init(): void
@@ -17,7 +18,7 @@ class SailContainersCommand extends Command
         $this->docker = new Docker();
 
         $this->docker->networks()->then(function (ResponseInterface $response) {
-            $networks = json_decode((string)$response->getBody());
+            $networks = json_decode((string) $response->getBody());
             foreach ($networks as $network) {
                 if (str_ends_with($network->Name, 'sail')) {
                     $this->state->set('sail_network_id', $network->Id);
@@ -37,7 +38,7 @@ class SailContainersCommand extends Command
 
         $this->docker->containers($filter)
             ->then(function (ResponseInterface $response) {
-                $containers = json_decode((string)$response->getBody());
+                $containers = json_decode((string) $response->getBody());
                 $statuses = [];
                 foreach ($containers as $container) {
                     foreach ($container->Names as $name) {
@@ -47,7 +48,7 @@ class SailContainersCommand extends Command
 
                 $this->state->set('services_status', $statuses);
             }, function (ResponseException $e) {
-                echo 'Error: ' . $e->getMessage() . PHP_EOL;
+                echo 'Error: '.$e->getMessage().PHP_EOL;
             });
     }
 }

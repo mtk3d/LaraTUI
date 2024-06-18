@@ -16,8 +16,7 @@ abstract class Command
         $this->init();
     }
 
-    protected function init(): void
-    {}
+    protected function init(): void {}
 
-    abstract function execute(array $data): void;
+    abstract public function execute(array $data): void;
 }

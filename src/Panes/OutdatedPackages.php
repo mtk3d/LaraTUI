@@ -19,6 +19,7 @@ use PhpTui\Tui\Widget\Widget;
 class OutdatedPackages extends Pane
 {
     private int $selectedItem = 0;
+
     private int $maxItems = 0;
 
     public function init(): void
@@ -51,6 +52,7 @@ class OutdatedPackages extends Pane
     private function getListOfPackages(): array
     {
         $outdatedPackages = $this->state->get('outdated_packages', []);
+
         return array_map(function ($package) {
             $name = $package['name'];
             $version = $package['version'];
@@ -74,21 +76,21 @@ class OutdatedPackages extends Pane
 
         return
             BlockWidget::default()
-            ->borders(Borders::ALL)
-            ->borderType(BorderType::Rounded)
-            ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
-            ->titles(
-                Title::fromString('  Package updates'),
-            )
-            ->titleStyle(Style::default()->bold())
-            ->widget(
-                ListWidget::default()
-                    ->highlightSymbol('')
-                    ->highlightStyle(Style::default()->lightRed())
-                    ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
-                    ->items(
-                        ...$outdatedPackages,
-                    )
-            );
+                ->borders(Borders::ALL)
+                ->borderType(BorderType::Rounded)
+                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->titles(
+                    Title::fromString('  Package updates'),
+                )
+                ->titleStyle(Style::default()->bold())
+                ->widget(
+                    ListWidget::default()
+                        ->highlightSymbol('')
+                        ->highlightStyle(Style::default()->lightRed())
+                        ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
+                        ->items(
+                            ...$outdatedPackages,
+                        )
+                );
     }
 }

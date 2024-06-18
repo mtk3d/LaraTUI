@@ -9,7 +9,5 @@ class Periodic
 {
     public function __construct(
         public readonly float $interval,
-    )
-    {}
+    ) {}
 }
-

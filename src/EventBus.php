@@ -8,7 +8,7 @@ class EventBus
 
     public function listenTo(string $eventName, callable $func): void
     {
-        if (!isset($this->register[$eventName])) {
+        if (! isset($this->register[$eventName])) {
             $this->register[$eventName] = [];
         }
 
@@ -17,7 +17,7 @@ class EventBus
 
     public function emit(string $eventName, array $data = []): void
     {
-        if (!isset($this->register[$eventName])) {
+        if (! isset($this->register[$eventName])) {
             return;
         }
 
