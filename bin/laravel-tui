@@ -23,4 +23,3 @@ VarDumper::setHandler(function ($var) use ($cloner, $dumper): void {
 
 $app = Application::new();
 exit($app->run());
-
