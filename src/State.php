@@ -8,6 +8,7 @@ class State
 
     public function set(string $key, mixed $value): void
     {
+        $this->delete($key);
         $this->state[$key] = $value;
     }
 
