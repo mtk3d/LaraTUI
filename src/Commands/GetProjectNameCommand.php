@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelSailTui\Commands;
+namespace LaraTui\Commands;
 
 class GetProjectNameCommand extends Command
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelSailTui\Panes;
+namespace LaraTui\Panes;
 
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;

@@ -1,10 +1,10 @@
 <?php
 
-namespace LaravelSailTui\Panes;
+namespace LaraTui\Panes;
 
-use LaravelSailTui\CommandAttributes\KeyPressed;
-use LaravelSailTui\CommandAttributes\Periodic;
-use LaravelSailTui\Commands\OutdatedPackagesCommand;
+use LaraTui\CommandAttributes\KeyPressed;
+use LaraTui\CommandAttributes\Periodic;
+use LaraTui\Commands\OutdatedPackagesCommand;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
 use PhpTui\Tui\Extension\Core\Widget\List\ListState;

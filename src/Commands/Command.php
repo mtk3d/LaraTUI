@@ -1,8 +1,8 @@
 <?php
 
-namespace LaravelSailTui\Commands;
+namespace LaraTui\Commands;
 
-use LaravelSailTui\State;
+use LaraTui\State;
 use React\EventLoop\LoopInterface;
 
 abstract class Command

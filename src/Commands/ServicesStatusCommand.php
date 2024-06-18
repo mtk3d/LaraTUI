@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelSailTui\Commands;
+namespace LaraTui\Commands;
 
 use React\ChildProcess\Process;
 

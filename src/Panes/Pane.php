@@ -1,12 +1,12 @@
 <?php
 
-namespace LaravelSailTui\Panes;
+namespace LaraTui\Panes;
 
-use LaravelSailTui\CommandAttributes\KeyPressed;
-use LaravelSailTui\CommandAttributes\Periodic;
-use LaravelSailTui\CommandBus;
-use LaravelSailTui\EventBus;
-use LaravelSailTui\State;
+use LaraTui\CommandAttributes\KeyPressed;
+use LaraTui\CommandAttributes\Periodic;
+use LaraTui\CommandBus;
+use LaraTui\EventBus;
+use LaraTui\State;
 use React\EventLoop\LoopInterface;
 use ReflectionObject;
 

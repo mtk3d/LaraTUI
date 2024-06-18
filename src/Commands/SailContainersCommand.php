@@ -1,9 +1,8 @@
 <?php
 
-namespace LaravelSailTui\Commands;
+namespace LaraTui\Commands;
 
-use LaravelSailTui\DockerClient\Docker;
-use LaravelSailTui\Logger;
+use LaraTui\DockerClient\Docker;
 use Psr\Http\Message\ResponseInterface;
 use React\Http\Message\ResponseException;
 

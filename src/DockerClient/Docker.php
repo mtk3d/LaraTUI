@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelSailTui\DockerClient;
+namespace LaraTui\DockerClient;
 
 use React\Http\Browser;
 use React\Promise\PromiseInterface;

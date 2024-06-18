@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelSailTui\CommandAttributes;
+namespace LaraTui\CommandAttributes;
 
 use Attribute;
 

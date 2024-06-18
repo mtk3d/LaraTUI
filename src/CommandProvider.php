@@ -1,11 +1,11 @@
 <?php
 
-namespace LaravelSailTui;
+namespace LaraTui;
 
-use LaravelSailTui\Commands\GetProjectNameCommand;
-use LaravelSailTui\Commands\OutdatedPackagesCommand;
-use LaravelSailTui\Commands\SailContainersCommand;
-use LaravelSailTui\Commands\ServicesStatusCommand;
+use LaraTui\Commands\GetProjectNameCommand;
+use LaraTui\Commands\OutdatedPackagesCommand;
+use LaraTui\Commands\SailContainersCommand;
+use LaraTui\Commands\ServicesStatusCommand;
 use React\EventLoop\LoopInterface;
 
 class CommandProvider

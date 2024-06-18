@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-use LaravelSailTui\CommandBus;
-use LaravelSailTui\CommandProvider;
-use LaravelSailTui\Commands\GetProjectNameCommand;
-use LaravelSailTui\DockerClient\Docker;
-use LaravelSailTui\EventBus;
-use LaravelSailTui\Logger;
-use LaravelSailTui\Panes\LaravelVersions;
-use LaravelSailTui\Panes\OutdatedPackages;
-use LaravelSailTui\Panes\OutputLog;
-use LaravelSailTui\Panes\Services;
-use LaravelSailTui\Panes\Project;
-use LaravelSailTui\State;
+use LaraTui\CommandBus;
+use LaraTui\CommandProvider;
+use LaraTui\Commands\GetProjectNameCommand;
+use LaraTui\EventBus;
+use LaraTui\Logger;
+use LaraTui\Panes\LaravelVersions;
+use LaraTui\Panes\OutdatedPackages;
+use LaraTui\Panes\OutputLog;
+use LaraTui\Panes\Services;
+use LaraTui\Panes\Project;
+use LaraTui\State;
 use PhpTui\Term\Actions;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\DisplayBuilder;
@@ -24,12 +23,9 @@ use PhpTui\Tui\Extension\Core\Widget\Buffer\BufferContext;
 use PhpTui\Tui\Extension\Core\Widget\BufferWidget;
 use PhpTui\Tui\Layout\Constraint;
 use PhpTui\Tui\Position\Position;
-use PhpTui\Tui\Text\Line;
 use PhpTui\Tui\Text\Span;
 use PhpTui\Tui\Widget\Direction;
-use Psr\Http\Message\ResponseInterface;
 use React\ChildProcess\Process;
-use React\Http\Message\ResponseException;
 use React\Stream\ReadableResourceStream;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -56,8 +52,6 @@ $state->set('_debug', false);
 
 $display = DisplayBuilder::default()->build();
 $display->clear();
-
-$docker = new Docker();
 
 $srv = new Services();
 $srv->registerPane($loop, $eventBus, $commandBus, $state);

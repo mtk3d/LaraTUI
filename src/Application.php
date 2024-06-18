@@ -1,13 +1,13 @@
 <?php
 
-namespace LaravelSailTui;
+namespace LaraTui;
 
-use LaravelSailTui\Commands\GetProjectNameCommand;
-use LaravelSailTui\Panes\LaravelVersions;
-use LaravelSailTui\Panes\OutdatedPackages;
-use LaravelSailTui\Panes\OutputLog;
-use LaravelSailTui\Panes\Project;
-use LaravelSailTui\Panes\Services;
+use LaraTui\Commands\GetProjectNameCommand;
+use LaraTui\Panes\LaravelVersions;
+use LaraTui\Panes\OutdatedPackages;
+use LaraTui\Panes\OutputLog;
+use LaraTui\Panes\Project;
+use LaraTui\Panes\Services;
 use PhpTui\Term\Actions;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
@@ -91,6 +91,8 @@ class Application
                 $this->state
             );
         }
+
+        $this->sidebarPanes[0]->selectPane();
     }
 
     public function resetPaneSelection(): void

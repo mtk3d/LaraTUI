@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use LaravelSailTui\Application;
+use LaraTui\Application;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
@@ -10,7 +10,6 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\ServerDumper;
 
 require __DIR__ . '/../vendor/autoload.php';
-
 
 $cloner = new VarCloner();
 $dumper = new ServerDumper('tcp://127.0.0.1:9912', new CliDumper(), [
@@ -24,3 +23,4 @@ VarDumper::setHandler(function ($var) use ($cloner, $dumper): void {
 
 $app = Application::new();
 exit($app->run());
+
