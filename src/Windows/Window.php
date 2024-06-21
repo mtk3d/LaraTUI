@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraTui\Panes;
+namespace LaraTui\Windows;
 
 use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
@@ -11,35 +11,75 @@ use PhpTui\Tui\Widget\Widget;
 use React\EventLoop\LoopInterface;
 use ReflectionObject;
 
-abstract class Pane
+abstract class Window
 {
-    protected bool $isSelected = false;
+    public bool $isHidden = true;
 
     protected EventBus $eventBus;
 
     protected CommandBus $commandBus;
 
+    protected LoopInterface $loop;
+
     protected State $state;
 
     protected array $timers = [];
+
+    protected array $panes = [];
+
+    protected array $panesInstances = [];
+
+    private int $selectedPane = 0;
 
     public function __construct() {}
 
     protected function init(): void {}
 
-    public function selectPane(): void
+    #[KeyPressed("n", true)]
+    public function nextPane(): void
     {
-        $this->isSelected = true;
+        if ($this->selectedPane < count($this->panesInstances) - 1) {
+            $this->selectedPane++;
+        } else {
+            $this->selectedPane = 0;
+        }
+
+        $this->resetPaneSelection();
+        array_values($this->panesInstances)[$this->selectedPane]->selectPane();
     }
 
-    public function deselectPane(): void
+    #[KeyPressed("p", true)]
+    public function previousPane(): void
     {
-        $this->isSelected = false;
+        if ($this->selectedPane > 0) {
+            $this->selectedPane--;
+        } else {
+            $this->selectedPane = count($this->panesInstances) - 1;
+        }
+        $this->resetPaneSelection();
+        array_values($this->panesInstances)[$this->selectedPane]->selectPane();
+    }
+
+    public function resetPaneSelection(): void
+    {
+        foreach ($this->panesInstances as $pane) {
+            $pane->deselectPane();
+        }
+    }
+
+    public function showWindow(): void
+    {
+        $this->isHidden = false;
+    }
+
+    public function hideWindow(): void
+    {
+        $this->isHidden = true;
     }
 
     abstract public function render(): Widget;
 
-    public function registerPane(
+    public function registerWindow(
         LoopInterface $loop,
         EventBus $eventBus,
         CommandBus $commandBus,
@@ -56,7 +96,7 @@ abstract class Pane
                 $eventBus->listenTo(
                     $attribute->key,
                     function () use ($attribute, $methodName) {
-                        if ($this->isSelected || $attribute->global) {
+                        if (!$this->isHidden || $attribute->global) {
                             $this->$methodName();
                         }
                     }
@@ -74,8 +114,28 @@ abstract class Pane
         $this->eventBus = $eventBus;
         $this->commandBus = $commandBus;
         $this->state = $state;
+        $this->loop = $loop;
+
+        $this->registerPanes();
 
         $this->init();
+    }
+
+    protected function  registerPanes(): void
+    {
+        foreach ($this->panes as $paneClass) {
+            $this->panesInstances[$paneClass] = new $paneClass();
+            $this->panesInstances[$paneClass]->registerPane($this->loop, $this->eventBus, $this->commandBus, $this->state);
+        }
+    }
+
+    protected function renderPane(string $paneClass): Widget
+    {
+        if (!isset($this->panesInstances[$paneClass])) {
+            throw new \Exception();
+        }
+
+        return $this->panesInstances[$paneClass]->render();
     }
 
     protected function emit(string $event, array $data): void

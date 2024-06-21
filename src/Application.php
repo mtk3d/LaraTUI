@@ -3,18 +3,12 @@
 namespace LaraTui;
 
 use LaraTui\Commands\GetProjectNameCommand;
-use LaraTui\Panes\LaravelVersions;
-use LaraTui\Panes\OutdatedPackages;
-use LaraTui\Panes\OutputLog;
-use LaraTui\Panes\Project;
-use LaraTui\Panes\Services;
+use LaraTui\Windows\Main;
+use LaraTui\Windows\Window;
 use PhpTui\Term\Actions;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
 use PhpTui\Tui\DisplayBuilder;
-use PhpTui\Tui\Extension\Core\Widget\GridWidget;
-use PhpTui\Tui\Layout\Constraint;
-use PhpTui\Tui\Widget\Direction;
 use React\ChildProcess\Process;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
@@ -22,11 +16,7 @@ use React\Stream\ReadableResourceStream;
 
 class Application
 {
-    private array $sidebarPanes = [];
-
-    private array $mainPanes = [];
-
-    private int $selectedPane = 0;
+    private Window $window;
 
     private function __construct(
         private LoopInterface $loop,
@@ -77,61 +67,21 @@ class Application
         $this->commandBus
             ->dispatch(GetProjectNameCommand::$commandName);
 
-        $this->sidebarPanes[] = new LaravelVersions();
-        $this->sidebarPanes[] = new Services();
-        $this->sidebarPanes[] = new OutdatedPackages();
-        $this->mainPanes[] = new Project();
-        $this->mainPanes[] = new OutputLog();
-        $this->mainPanes[] = new OutputLog();
-
-        foreach ([...$this->sidebarPanes, ...$this->mainPanes] as $pane) {
-            $pane->registerPane(
-                $this->loop,
-                $this->eventBus,
-                $this->commandBus,
-                $this->state
-            );
-        }
-
-        $this->sidebarPanes[0]->selectPane();
-    }
-
-    public function resetPaneSelection(): void
-    {
-        foreach ([...$this->sidebarPanes, ...$this->mainPanes] as $pane) {
-            $pane->deselectPane();
-        }
+        $this->window = new Main();
+        $this->window->registerWindow($this->loop, $this->eventBus, $this->commandBus, $this->state);
     }
 
     public function startRendering(): void
     {
         $this->loop->addPeriodicTimer(1 / 60, function () {
             $this->display->draw(
-                GridWidget::default()
-                    ->direction(Direction::Horizontal)
-                    ->constraints(
-                        Constraint::percentage(30),
-                        Constraint::percentage(70),
-                    )
-                    ->widgets(
-                        GridWidget::default()
-                            ->direction(Direction::Vertical)
-                            ->constraints(
-                                Constraint::length(3),
-                                Constraint::percentage(50),
-                                Constraint::percentage(50),
-                            )->widgets(
-                                ...array_map(fn ($pane) => $pane->render(), $this->sidebarPanes),
-                            ),
-                        $this->mainPanes[$this->selectedPane]->render(),
-                    )
+                $this->window->render(),
             );
         });
     }
 
     public function startInputHandling(): void
     {
-
         $stdin = new ReadableResourceStream(STDIN, $this->loop);
 
         $stdin->on('data', function ($data) {
@@ -143,25 +93,6 @@ class Application
                 $this->terminal->execute(Actions::cursorShow());
                 $this->terminal->execute(Actions::alternateScreenDisable());
                 $this->loop->stop();
-            }
-            if (strpos($data, "\t") !== false) { // Tab
-                if ($this->selectedPane < count($this->sidebarPanes) - 1) {
-                    $this->selectedPane++;
-                } else {
-                    $this->selectedPane = 0;
-                }
-
-                $this->resetPaneSelection();
-                $this->sidebarPanes[$this->selectedPane]->selectPane();
-            }
-            if ($data === "\033[Z") { // Shift tab
-                if ($this->selectedPane > 0) {
-                    $this->selectedPane--;
-                } else {
-                    $this->selectedPane = count($this->sidebarPanes) - 1;
-                }
-                $this->resetPaneSelection();
-                $this->sidebarPanes[$this->selectedPane]->selectPane();
             }
             if ($data === 'u') {
                 $process = new Process('docker compose up -d');
