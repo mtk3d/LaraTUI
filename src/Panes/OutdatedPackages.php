@@ -5,11 +5,14 @@ namespace LaraTui\Panes;
 use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\OutdatedPackagesCommand;
+use LaraTui\Traits\ListManager;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
 use PhpTui\Tui\Extension\Core\Widget\List\ListState;
 use PhpTui\Tui\Extension\Core\Widget\ListWidget;
+use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Style\Style;
+use PhpTui\Tui\Text\Line;
 use PhpTui\Tui\Text\Text;
 use PhpTui\Tui\Text\Title;
 use PhpTui\Tui\Widget\Borders;
@@ -18,29 +21,18 @@ use PhpTui\Tui\Widget\Widget;
 
 class OutdatedPackages extends Pane
 {
-    private int $selectedItem = 0;
+    use ListManager;
 
-    private int $maxItems = 0;
+    private array $packages = [];
 
     public function init(): void
     {
         $this->collectServicesData();
     }
 
-    #[KeyPressed('k')]
-    public function up(): void
+    protected function items(): array
     {
-        if ($this->selectedItem > 0) {
-            $this->selectedItem--;
-        }
-    }
-
-    #[KeyPressed('j')]
-    public function down(): void
-    {
-        if ($this->selectedItem < $this->maxItems) {
-            $this->selectedItem++;
-        }
+        return $this->packages;
     }
 
     #[Periodic(30)]
@@ -49,11 +41,11 @@ class OutdatedPackages extends Pane
         $this->commandBus->dispatch(OutdatedPackagesCommand::$commandName);
     }
 
-    private function getListOfPackages(): array
+    private function updateListOfPackages(): void
     {
         $outdatedPackages = $this->state->get('outdated_packages', []);
 
-        return array_map(function ($package) {
+        $this->packages = array_map(function ($package) {
             $name = $package['name'];
             $version = $package['version'];
             $latest = $package['latest'];
@@ -71,8 +63,7 @@ class OutdatedPackages extends Pane
 
     public function render(): Widget
     {
-        $outdatedPackages = $this->getListOfPackages();
-        $this->maxItems = count($outdatedPackages) - 1;
+        $this->updateListOfPackages();
 
         return
             BlockWidget::default()
@@ -84,12 +75,14 @@ class OutdatedPackages extends Pane
                 )
                 ->titleStyle(Style::default()->bold())
                 ->widget(
+                    empty($this->packages) ?
+                    ParagraphWidget::fromLines(Line::parse('<fg=darkGray>Loading...</>')) :
                     ListWidget::default()
                         ->highlightSymbol('')
                         ->highlightStyle(Style::default()->lightRed())
                         ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
                         ->items(
-                            ...$outdatedPackages,
+                            ...$this->packages,
                         )
                 );
     }

@@ -2,6 +2,7 @@
 
 namespace LaraTui\Panes;
 
+use LaraTui\Traits\TabManager;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
@@ -19,15 +20,41 @@ use PhpTui\Tui\Widget\Widget;
 
 class Project extends Pane
 {
+    use TabManager;
+
+    public function tabs(): array
+    {
+        return ['','','', ''];
+    }
+
+    public function titles(): array
+    {
+        $titles = [
+Line::fromString('  Condition '), Line::fromString('  Logs '), Line::fromString('  Artisan '), Line::fromString(' 󰯷 envs'),
+        ];
+
+        $titlesObjs = [];
+
+        foreach ($titles as $index => $title) {
+            $title->patchStyle(Style::default());
+            if ($index === $this->currentTab) {
+                $title->red();
+            }
+            $titlesObjs[] = Title::fromLine($title);
+        }
+
+        return $titlesObjs;
+    }
+
     public function welcomeMessage(): string
     {
         $message = <<<HEREDOC
-  _                   _____ _   _ ___ 
- | |    __ _ _ __ __ |_   _| | | |_ _|
- | |   / _` | '__/ _` || | | | | || | 
- | |__| (_| | | | (_| || | | |_| || | 
- |_____\__,_|_|  \__,_||_|  \___/|___|
-HEREDOC;
+         _                   _____ _   _ ___ 
+        | |    __ _ _ __ __ |_   _| | | |_ _|
+        | |   / _` | '__/ _` || | | | | || | 
+        | |__| (_| | | | (_| || | | |_| || | 
+        |_____\__,_|_|  \__,_||_|  \___/|___|
+        HEREDOC;
 
         return $message;
     }
@@ -79,7 +106,7 @@ HEREDOC;
             BlockWidget::default()
                 ->borders(Borders::ALL)
                 ->borderType(BorderType::Rounded)
-                ->titles(Title::fromString('  Condition '), Title::fromString('  Logs '), Title::fromString('  Artisan '), Title::fromString(' 󰯷 envs'))
+                ->titles(...$this->titles())
                 ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
                 ->widget(
                     GridWidget::default()

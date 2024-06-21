@@ -5,6 +5,7 @@ namespace LaraTui\Panes;
 use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\ServicesStatusCommand;
+use LaraTui\Traits\ListManager;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
 use PhpTui\Tui\Extension\Core\Widget\List\ListState;
@@ -18,7 +19,7 @@ use PhpTui\Tui\Widget\Widget;
 
 class Services extends Pane
 {
-    private int $selectedItem = 0;
+    use ListManager;
 
     private array $services = [
         [
@@ -68,25 +69,14 @@ class Services extends Pane
         ],
     ];
 
+    protected function items(): array
+    {
+        return $this->services;
+    }
+
     public function init(): void
     {
         $this->collectServicesData();
-    }
-
-    #[KeyPressed('k')]
-    public function up(): void
-    {
-        if ($this->selectedItem > 0) {
-            $this->selectedItem--;
-        }
-    }
-
-    #[KeyPressed('j')]
-    public function down(): void
-    {
-        if ($this->selectedItem < count($this->services) - 1) {
-            $this->selectedItem++;
-        }
     }
 
     #[Periodic(1)]

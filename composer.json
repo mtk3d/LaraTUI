@@ -23,6 +23,12 @@
     "require-dev": {
         "laravel/pint": "^1.16",
         "symfony/var-dumper": "^7.1",
-        "symfony/console": "^7.1"
+        "symfony/console": "^7.1",
+        "pestphp/pest": "^2.34"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }
