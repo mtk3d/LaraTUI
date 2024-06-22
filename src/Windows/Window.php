@@ -7,6 +7,7 @@ use LaraTui\CommandAttributes\Periodic;
 use LaraTui\CommandBus;
 use LaraTui\EventBus;
 use LaraTui\State;
+use PhpTui\Term\KeyCode;
 use PhpTui\Tui\Widget\Widget;
 use React\EventLoop\LoopInterface;
 use ReflectionObject;
@@ -35,7 +36,7 @@ abstract class Window
 
     protected function init(): void {}
 
-    #[KeyPressed("n", true)]
+    #[KeyPressed(KeyCode::Tab, true)]
     public function nextPane(): void
     {
         if ($this->selectedPane < count($this->panesInstances) - 1) {
@@ -48,7 +49,7 @@ abstract class Window
         array_values($this->panesInstances)[$this->selectedPane]->selectPane();
     }
 
-    #[KeyPressed("p", true)]
+    #[KeyPressed(KeyCode::BackTab, true)]
     public function previousPane(): void
     {
         if ($this->selectedPane > 0) {

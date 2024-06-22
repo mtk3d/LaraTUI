@@ -6,6 +6,7 @@ use LaraTui\Commands\GetProjectNameCommand;
 use LaraTui\Windows\Main;
 use LaraTui\Windows\Window;
 use PhpTui\Term\Actions;
+use PhpTui\Term\EventParser;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
 use PhpTui\Tui\DisplayBuilder;
@@ -17,6 +18,7 @@ use React\Stream\ReadableResourceStream;
 class Application
 {
     private Window $window;
+    private EventParser $eventParser;
 
     private function __construct(
         private LoopInterface $loop,
@@ -25,7 +27,9 @@ class Application
         private EventBus $eventBus,
         private CommandBus $commandBus,
         private State $state,
-    ) {}
+    ) {
+        $this->eventParser = new EventParser();
+    }
 
     public static function new(): self
     {
@@ -85,7 +89,11 @@ class Application
         $stdin = new ReadableResourceStream(STDIN, $this->loop);
 
         $stdin->on('data', function ($data) {
-            $this->eventBus->emit($data);
+            $this->eventParser->advance($data, false);
+
+            foreach ($this->eventParser->drain() as $event) {
+                $this->eventBus->emit($event);
+            }
 
             if ($data === 'q') {
                 $this->terminal->disableRawMode();
