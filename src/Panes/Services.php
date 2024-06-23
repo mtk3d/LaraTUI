@@ -2,7 +2,6 @@
 
 namespace LaraTui\Panes;
 
-use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\ServicesStatusCommand;
 use LaraTui\Traits\ListManager;
@@ -82,7 +81,7 @@ class Services extends Pane
     #[Periodic(1)]
     public function collectServicesData(): void
     {
-        $this->commandBus->dispatch(ServicesStatusCommand::$commandName);
+        $this->commandBus->dispatch(ServicesStatusCommand::class);
     }
 
     private function combineServicesWithStatus(): array
@@ -136,7 +135,7 @@ class Services extends Pane
                 ->titles(
                     Title::fromString(' 󰡨 Services'),
                 )
-                ->titleStyle(Style::default()->bold())
+                ->titleStyle(Style::default()->white())
                 ->widget(
                     ListWidget::default()
                         ->highlightSymbol('')

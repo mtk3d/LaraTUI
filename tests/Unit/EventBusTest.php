@@ -1,13 +1,16 @@
 <?php
 
 use LaraTui\EventBus;
+use PhpTui\Term\Event\CharKeyEvent;
+use PhpTui\Term\Event\CodedKeyEvent;
+use PhpTui\Term\KeyCode;
 
 describe('test event bus', function () {
     beforeEach(function () {
         $this->eventBus = new EventBus();
     });
 
-    test('can pass event to handler', function () {
+    test('can pass char key event to handlers', function () {
         $firstCalledWith = false;
         $secondCalledWith = false;
 
@@ -19,12 +22,26 @@ describe('test event bus', function () {
             $secondCalledWith = $data;
         };
 
-        $this->eventBus->listenTo('event_name', $firstHandler);
-        $this->eventBus->listenTo('event_name', $secondHandler);
+        $this->eventBus->listenTo('k', $firstHandler);
+        $this->eventBus->listenTo('k', $secondHandler);
 
-        $this->eventBus->emit('event_name', ['some_data']);
+        $this->eventBus->emit(CharKeyEvent::new('k'), ['some_data']);
 
         expect($firstCalledWith)->toBe(['some_data']);
         expect($secondCalledWith)->toBe(['some_data']);
+    });
+
+    test('can pass key code event to handlers', function () {
+        $calledWith = false;
+
+        $handler = function ($data) use (&$calledWith) {
+            $calledWith = $data;
+        };
+
+        $this->eventBus->listenTo(KeyCode::Enter, $handler);
+
+        $this->eventBus->emit(CodedKeyEvent::new(KeyCode::Enter), ['some_data']);
+
+        expect($calledWith)->toBe(['some_data']);
     });
 });

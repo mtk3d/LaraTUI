@@ -18,7 +18,9 @@
         "react/event-loop": "^1.5.0",
         "react/http": "^1.10.0",
         "react/stream": "^1.3.0",
-        "react/child-process": "^0.6.5"
+        "react/child-process": "^0.6.5",
+        "spatie/data-transfer-object": "^3.9",
+        "react/promise": "^3.2.0"
     },
     "require-dev": {
         "laravel/pint": "^1.16",

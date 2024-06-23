@@ -2,7 +2,6 @@
 
 namespace LaraTui\Panes;
 
-use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\OutdatedPackagesCommand;
 use LaraTui\Traits\ListManager;
@@ -38,7 +37,7 @@ class OutdatedPackages extends Pane
     #[Periodic(30)]
     public function collectServicesData(): void
     {
-        $this->commandBus->dispatch(OutdatedPackagesCommand::$commandName);
+        $this->commandBus->dispatch(OutdatedPackagesCommand::class);
     }
 
     private function updateListOfPackages(): void
@@ -73,7 +72,7 @@ class OutdatedPackages extends Pane
                 ->titles(
                     Title::fromString('  Package updates'),
                 )
-                ->titleStyle(Style::default()->bold())
+                ->titleStyle(Style::default()->white())
                 ->widget(
                     empty($this->packages) ?
                     ParagraphWidget::fromLines(Line::parse('<fg=darkGray>Loading...</>')) :

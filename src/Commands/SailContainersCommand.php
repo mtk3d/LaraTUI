@@ -8,8 +8,6 @@ use React\Http\Message\ResponseException;
 
 class SailContainersCommand extends Command
 {
-    public static string $commandName = 'sail_containers_command';
-
     private readonly Docker $docker;
 
     public function init(): void

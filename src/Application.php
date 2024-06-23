@@ -6,18 +6,21 @@ use LaraTui\Commands\GetProjectNameCommand;
 use LaraTui\Windows\Main;
 use LaraTui\Windows\Window;
 use PhpTui\Term\Actions;
+use PhpTui\Term\Event\CharKeyEvent;
+use PhpTui\Term\Event\CodedKeyEvent;
 use PhpTui\Term\EventParser;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
 use PhpTui\Tui\DisplayBuilder;
-use React\ChildProcess\Process;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
+use React\Http\Browser;
 use React\Stream\ReadableResourceStream;
 
 class Application
 {
     private Window $window;
+
     private EventParser $eventParser;
 
     private function __construct(
@@ -37,7 +40,8 @@ class Application
         $eventBus = new EventBus();
         $commandBus = new CommandBus();
         $state = new State();
-        $commandProvider = new CommandProvider($state, $loop, $commandBus);
+        $browser = new Browser();
+        $commandProvider = new CommandProvider($state, $loop, $commandBus, $browser);
         $commandProvider->boot();
 
         return new self(
@@ -69,7 +73,7 @@ class Application
     public function init(): void
     {
         $this->commandBus
-            ->dispatch(GetProjectNameCommand::$commandName);
+            ->dispatch(GetProjectNameCommand::class);
 
         $this->window = new Main();
         $this->window->registerWindow($this->loop, $this->eventBus, $this->commandBus, $this->state);
@@ -87,12 +91,13 @@ class Application
     public function startInputHandling(): void
     {
         $stdin = new ReadableResourceStream(STDIN, $this->loop);
-
         $stdin->on('data', function ($data) {
             $this->eventParser->advance($data, false);
 
             foreach ($this->eventParser->drain() as $event) {
-                $this->eventBus->emit($event);
+                if (in_array($event::class, [CharKeyEvent::class, CodedKeyEvent::class])) {
+                    $this->eventBus->emit($event);
+                }
             }
 
             if ($data === 'q') {
@@ -101,31 +106,6 @@ class Application
                 $this->terminal->execute(Actions::cursorShow());
                 $this->terminal->execute(Actions::alternateScreenDisable());
                 $this->loop->stop();
-            }
-            if ($data === 'u') {
-                $process = new Process('docker compose up -d');
-                $this->state->delete('output_log');
-
-                $process->start($this->loop);
-                $process->stdout->on('data', function ($chunk) {
-                    $this->state->append('output_log', $chunk);
-                });
-                $process->stderr->on('data', function ($chunk) {
-                    $this->state->append('output_log', $chunk);
-                });
-            }
-
-            if ($data === 'm') {
-                $process = new Process('php artisan migrate');
-                $this->state->delete('output_log');
-
-                $process->start($this->loop);
-                $process->stdout->on('data', function ($chunk) {
-                    $this->state->append('output_log', $chunk);
-                });
-                $process->stderr->on('data', function ($chunk) {
-                    $this->state->append('output_log', $chunk);
-                });
             }
         });
     }

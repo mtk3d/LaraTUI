@@ -97,7 +97,7 @@ abstract class Window
                 $eventBus->listenTo(
                     $attribute->key,
                     function () use ($attribute, $methodName) {
-                        if (!$this->isHidden || $attribute->global) {
+                        if (! $this->isHidden || $attribute->global) {
                             $this->$methodName();
                         }
                     }
@@ -122,7 +122,7 @@ abstract class Window
         $this->init();
     }
 
-    protected function  registerPanes(): void
+    protected function registerPanes(): void
     {
         foreach ($this->panes as $paneClass) {
             $this->panesInstances[$paneClass] = new $paneClass();
@@ -132,7 +132,7 @@ abstract class Window
 
     protected function renderPane(string $paneClass): Widget
     {
-        if (!isset($this->panesInstances[$paneClass])) {
+        if (! isset($this->panesInstances[$paneClass])) {
             throw new \Exception();
         }
 

@@ -6,22 +6,22 @@ class CommandBus
 {
     private $register = [];
 
-    public function reactTo(string $commandName, callable $func): void
+    public function reactTo(string $commandClass, callable $func): void
     {
-        if (! isset($this->register[$commandName])) {
-            $this->register[$commandName] = [];
+        if (! isset($this->register[$commandClass])) {
+            $this->register[$commandClass] = [];
         }
 
-        $this->register[$commandName][] = $func;
+        $this->register[$commandClass][] = $func;
     }
 
-    public function dispatch(string $commandName, array $data = []): void
+    public function dispatch(string $commandClass, array $data = []): void
     {
-        if (! isset($this->register[$commandName])) {
+        if (! isset($this->register[$commandClass])) {
             return;
         }
 
-        foreach ($this->register[$commandName] as $func) {
+        foreach ($this->register[$commandClass] as $func) {
             $func($data);
         }
     }

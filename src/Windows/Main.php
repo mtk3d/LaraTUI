@@ -2,6 +2,9 @@
 
 namespace LaraTui\Windows;
 
+use LaraTui\Commands\FetchComposerVersionsCommand;
+use LaraTui\Commands\FetchLaravelVersionsCommand;
+use LaraTui\Commands\FetchPHPVersionsCommand;
 use LaraTui\Panes\LaravelVersions;
 use LaraTui\Panes\OutdatedPackages;
 use LaraTui\Panes\Project;
@@ -19,6 +22,14 @@ class Main extends Window
         OutdatedPackages::class,
         Project::class,
     ];
+
+    public function init(): void
+    {
+        $this->commandBus->dispatch(FetchPHPVersionsCommand::class);
+        $this->commandBus->dispatch(FetchLaravelVersionsCommand::class);
+        $this->commandBus->dispatch(FetchComposerVersionsCommand::class);
+        array_values($this->panesInstances)[0]->selectPane();
+    }
 
     public function render(): Widget
     {

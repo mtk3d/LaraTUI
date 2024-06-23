@@ -2,6 +2,10 @@
 
 namespace LaraTui\Panes;
 
+use LaraTui\Panes\Services\VersionsParser;
+use LaraTui\State\InstalledPackages;
+use LaraTui\State\LaravelVersions;
+use LaraTui\State\PHPVersions;
 use LaraTui\Traits\TabManager;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
@@ -22,21 +26,35 @@ class Project extends Pane
 {
     use TabManager;
 
+    private Line $version;
+
+    public function init(): void
+    {
+        $this->version = Line::fromString('Loading...');
+
+        $this->loop->addTimer(8, function () {
+            $this->version = VersionsParser::parseVersions(
+                $this->state->get('existing_php_version', ''),
+                $this->state->get(InstalledPackages::class),
+                $this->state->get(LaravelVersions::class),
+                $this->state->get(PHPVersions::class),
+            );
+        });
+    }
+
     public function tabs(): array
     {
-        return ['','','', ''];
+        return [
+            Line::fromString('  Condition '), Line::fromString('  Logs '), Line::fromString('  Artisan '), Line::fromString(' 󰯷 envs'),
+        ];
     }
 
     public function titles(): array
     {
-        $titles = [
-Line::fromString('  Condition '), Line::fromString('  Logs '), Line::fromString('  Artisan '), Line::fromString(' 󰯷 envs'),
-        ];
-
         $titlesObjs = [];
 
-        foreach ($titles as $index => $title) {
-            $title->patchStyle(Style::default());
+        foreach ($this->tabs() as $index => $title) {
+            $title->patchStyle(Style::default()->white());
             if ($index === $this->currentTab) {
                 $title->red();
             }
@@ -113,6 +131,7 @@ Line::fromString('  Condition '), Line::fromString('  Logs '), Line::fromS
                         ->direction(Direction::Vertical)
                         ->constraints(
                             Constraint::min(6),
+                            Constraint::min(3),
                             Constraint::min(4),
                             Constraint::min(4),
                             Constraint::min(2),
@@ -120,6 +139,7 @@ Line::fromString('  Condition '), Line::fromString('  Logs '), Line::fromS
                         )
                         ->widgets(
                             ParagraphWidget::fromString($this->welcomeMessage())->style(Style::default()->red()),
+                            ParagraphWidget::fromLines($this->version),
                             TableWidget::default()
                                 ->widths(
                                     Constraint::length(20),

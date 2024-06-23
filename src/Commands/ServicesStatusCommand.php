@@ -6,8 +6,6 @@ use React\ChildProcess\Process;
 
 class ServicesStatusCommand extends Command
 {
-    public static string $commandName = 'services_status_command';
-
     public function init(): void
     {
         $this->state->set('sail_services_status', 'Loading...');

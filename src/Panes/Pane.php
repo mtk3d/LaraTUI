@@ -21,6 +21,8 @@ abstract class Pane
 
     protected State $state;
 
+    protected LoopInterface $loop;
+
     protected array $timers = [];
 
     public function __construct() {}
@@ -74,6 +76,7 @@ abstract class Pane
         $this->eventBus = $eventBus;
         $this->commandBus = $commandBus;
         $this->state = $state;
+        $this->loop = $loop;
 
         $this->init();
     }

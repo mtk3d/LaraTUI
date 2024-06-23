@@ -24,7 +24,7 @@ class LaravelVersions extends Pane
                 ->titles(
                     Title::fromString(' 󰫐 Project'),
                 )
-                ->titleStyle(Style::default()->bold())
+                ->titleStyle(Style::default()->white())
                 ->widget(
                     ParagraphWidget::fromString($this->state->get('project_name')),
                 );

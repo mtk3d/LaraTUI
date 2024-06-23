@@ -27,10 +27,12 @@ describe('test global app state', function () {
     });
 
     test('is destroying object when delete', function () {
-        class TestClass {
+        class TestClass
+        {
             public static $destructorCalled = false;
 
-            public function __destruct() {
+            public function __destruct()
+            {
                 self::$destructorCalled = true;
             }
         }
@@ -41,4 +43,3 @@ describe('test global app state', function () {
         expect(TestClass::$destructorCalled)->toBeTrue();
     });
 });
-
