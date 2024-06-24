@@ -4,7 +4,7 @@ LaraTUI is terminal user interface for laravel local environment
 
 ![Interface](./assets/interface.png)
 
-Project is something between PoC and pre-Alpha. There are no tests, some parts are mocked, and it needs some refactoring.
+Project state is something around PoC and pre-Alpha. Some parts are mocked, it's flaky, and it needs refactoring and more tests.
 
 ## Requirements
 
