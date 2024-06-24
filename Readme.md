@@ -32,4 +32,5 @@ Project is something between PoC and pre-Alpha. There are no tests, some parts a
 - [ ] running artisan commands with quick commands
 - [ ] support other envs than laravel sail like laradock or vault
 - [ ] implement project creating window
+- [ ] support no nerdfont
 - [ ] implement composer audit execution
