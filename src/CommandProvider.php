@@ -5,6 +5,7 @@ namespace LaraTui;
 use LaraTui\Commands\BuildVersionsInfo;
 use LaraTui\Commands\FetchVersionsInfoCommand;
 use LaraTui\Commands\GetProjectNameCommand;
+use LaraTui\Commands\MigrationStatusCommand;
 use LaraTui\Commands\OutdatedPackagesCommand;
 use LaraTui\Commands\SailContainersCommand;
 use LaraTui\Commands\ServicesStatusCommand;
@@ -29,6 +30,7 @@ class CommandProvider
         $this->register(GetProjectNameCommand::class);
         $this->register(FetchVersionsInfoCommand::class);
         $this->register(BuildVersionsInfo::class);
+        $this->register(MigrationStatusCommand::class);
     }
 
     private function register(string $className): void

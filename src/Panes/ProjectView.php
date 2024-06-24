@@ -4,7 +4,9 @@ namespace LaraTui\Panes;
 
 use Illuminate\Support\Str;
 use LaraTui\Commands\FetchVersionsInfoCommand;
+use LaraTui\Commands\MigrationStatusCommand;
 use LaraTui\Panes\Services\VersionsParser;
+use LaraTui\State\MigrationStatus;
 use LaraTui\State\OutdatedPackages;
 use LaraTui\State\VersionsInfo;
 use LaraTui\Traits\TabManager;
@@ -32,6 +34,7 @@ class ProjectView extends Pane
         $this->versions = ParagraphWidget::fromSpans(Span::fromString('Loading...')->darkGray());
 
         $this->commandBus->dispatch(FetchVersionsInfoCommand::class);
+        $this->commandBus->dispatch(MigrationStatusCommand::class);
 
         $this->eventBus->listenTo('BuildVersionsFinished', function () {
             $this->versions = VersionsParser::parseVersions(
@@ -92,6 +95,23 @@ class ProjectView extends Pane
         ];
     }
 
+    public function getMigrationStatus(): Widget
+    {
+        $migrationStatus = $this->state->get(MigrationStatus::class);
+
+        if (! $migrationStatus) {
+            return ParagraphWidget::fromSpans(Span::fromString('Loading...')->gray());
+        }
+
+        if ($migrationStatus->pending) {
+            $line = Line::parse("<fg=yellow>$migrationStatus->pending/$migrationStatus->all</> migrations are waiting for execution <fg=darkGray>(press <options=bold><fg=blue>m</></> to migrate)");
+        } else {
+            $line = Line::parse('You don\'t have any pending migrations <fg=green></>');
+        }
+
+        return ParagraphWidget::fromLines($line);
+    }
+
     public function render(): Widget
     {
         return
@@ -114,9 +134,7 @@ class ProjectView extends Pane
                             ParagraphWidget::fromString($this->welcomeMessage())->style(Style::default()->red()),
                             $this->versions,
                             ParagraphWidget::fromLines(...$this->getNumberOfUpdated()),
-                            ParagraphWidget::fromLines(
-                                Line::parse('You have migrations waiting for execution: <fg=yellow>2</> <fg=darkGray>(press <options=bold>m</> to migrate)'),
-                            ),
+                            $this->getMigrationStatus(),
                             ParagraphWidget::fromLines(
                                 Line::parse('Is your app publically visible?: <fg=green>Yes (http://23.213.21.2/)</> <fg=darkGray>(press <options=bold>p</> to change that or <options=bold>o</> to open in browser)</>')
 
