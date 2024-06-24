@@ -2,22 +2,19 @@
 
 namespace LaraTui\Panes;
 
+use Illuminate\Support\Str;
 use LaraTui\Commands\FetchVersionsInfoCommand;
 use LaraTui\Panes\Services\VersionsParser;
-use LaraTui\State\ComposerVersion;
-use LaraTui\State\InstalledPackages;
-use LaraTui\State\LaravelVersions;
-use LaraTui\State\PHPVersions;
+use LaraTui\State\OutdatedPackages;
+use LaraTui\State\VersionsInfo;
 use LaraTui\Traits\TabManager;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
-use PhpTui\Tui\Extension\Core\Widget\Table\TableCell;
-use PhpTui\Tui\Extension\Core\Widget\Table\TableRow;
-use PhpTui\Tui\Extension\Core\Widget\TableWidget;
 use PhpTui\Tui\Layout\Constraint;
 use PhpTui\Tui\Style\Style;
 use PhpTui\Tui\Text\Line;
+use PhpTui\Tui\Text\Span;
 use PhpTui\Tui\Text\Title;
 use PhpTui\Tui\Widget\Borders;
 use PhpTui\Tui\Widget\BorderType;
@@ -28,20 +25,17 @@ class ProjectView extends Pane
 {
     use TabManager;
 
-    private Line $version;
+    private Widget $versions;
 
     public function init(): void
     {
+        $this->versions = ParagraphWidget::fromSpans(Span::fromString('Loading...')->darkGray());
+
         $this->commandBus->dispatch(FetchVersionsInfoCommand::class);
 
-        $this->version = Line::fromString('Loading...');
-
-        $this->eventBus->listenTo('PHPVersionsFetched', function () {
-            $this->version = VersionsParser::parseVersions(
-                $this->state->get(ComposerVersion::class),
-                $this->state->get(InstalledPackages::class),
-                $this->state->get(LaravelVersions::class),
-                $this->state->get(PHPVersions::class),
+        $this->eventBus->listenTo('BuildVersionsFinished', function () {
+            $this->versions = VersionsParser::parseVersions(
+                $this->state->get(VersionsInfo::class),
             );
         });
     }
@@ -81,44 +75,20 @@ class ProjectView extends Pane
         return $message;
     }
 
-    public function getVersions(): array
-    {
-        return [
-            TableRow::fromCells(
-                TableCell::fromString('Laravel Framework'),
-                TableCell::fromLine(
-                    Line::parse('<fg=green> 11.10.0</>')
-                ),
-                TableCell::fromString('Supported Latest')
-            ),
-            TableRow::fromCells(
-                TableCell::fromString('Local PHP'),
-                TableCell::fromLine(
-                    Line::parse('<fg=yellow> 8.2.1</>')
-                ),
-                TableCell::fromLine(Line::parse('Supported <fg=darkGray>(newer version available)</>'))
-            ),
-            TableRow::fromCells(
-                TableCell::fromString('Local Composer'),
-                TableCell::fromLine(
-                    Line::parse('<fg=red> 2.7.6</>')
-                ),
-                TableCell::fromLine(Line::parse('Outdated <fg=darkGray>(update required)</>'))
-            ),
-        ];
-    }
-
     public function getNumberOfUpdated(): array
     {
-        $outdatedPackages = $this->state->get('outdated_packages', []);
-        $result = 'You have some outdated packages: <fg=darkGray>(press <options=bold>u</> to run update)</>'.PHP_EOL;
-        $minor = '<fg=red>Minor/Patch updates:</> '.count(array_filter($outdatedPackages, fn ($package) => $package['latest-status'] === 'semver-safe-update')).PHP_EOL;
-        $major = '<fg=yellow>Major updates:</> '.count(array_filter($outdatedPackages, fn ($package) => $package['latest-status'] === 'update-possible')).PHP_EOL;
+        $outdatedPackages = collect($this->state
+            ->get(OutdatedPackages::class)
+            ?->installed)
+            ->countBy(fn ($package) => Str::camel($package->latestStatus));
+
+        $possibleToUpdate = $outdatedPackages->get('possibleToUpdate', 0);
+        $safeToUpdate = $outdatedPackages->get('semverSafeUpdate', 0);
 
         return [
-            Line::parse($result),
-            Line::parse($minor),
-            Line::parse($major),
+            Line::parse('<fg=darkGray>Press <options=bold><fg=blue>u</></> to run safe update, or <options=bold><fg=blue>U</></> to update all)</>'),
+            Line::parse("<fg=red>Packages major updates:</> $possibleToUpdate"),
+            Line::parse("<fg=yellow>Packages minor/patch updates:</> $safeToUpdate"),
         ];
     }
 
@@ -135,7 +105,6 @@ class ProjectView extends Pane
                         ->direction(Direction::Vertical)
                         ->constraints(
                             Constraint::min(6),
-                            Constraint::min(3),
                             Constraint::min(4),
                             Constraint::min(4),
                             Constraint::min(2),
@@ -143,16 +112,7 @@ class ProjectView extends Pane
                         )
                         ->widgets(
                             ParagraphWidget::fromString($this->welcomeMessage())->style(Style::default()->red()),
-                            ParagraphWidget::fromLines($this->version),
-                            TableWidget::default()
-                                ->widths(
-                                    Constraint::length(20),
-                                    Constraint::length(11),
-                                    Constraint::length(20),
-                                )
-                                ->rows(
-                                    ...$this->getVersions(),
-                                ),
+                            $this->versions,
                             ParagraphWidget::fromLines(...$this->getNumberOfUpdated()),
                             ParagraphWidget::fromLines(
                                 Line::parse('You have migrations waiting for execution: <fg=yellow>2</> <fg=darkGray>(press <options=bold>m</> to migrate)'),

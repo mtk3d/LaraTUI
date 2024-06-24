@@ -2,6 +2,7 @@
 
 namespace LaraTui\Commands;
 
+use LaraTui\CommandBus;
 use LaraTui\EventBus;
 use LaraTui\State;
 use React\ChildProcess\Process;
@@ -19,6 +20,7 @@ abstract class Command
         protected readonly LoopInterface $loop,
         protected readonly Browser $browser,
         protected readonly EventBus $eventBus,
+        protected readonly CommandBus $commandBus,
     ) {
         $this->init();
     }
@@ -34,8 +36,12 @@ abstract class Command
         $process->start($this->loop);
         $this->outputs[$command] = '';
 
-        $process->stdout->on('data', function ($chank) use ($command) {
-            $this->outputs[$command] .= $chank;
+        $process->stdout->on('data', function ($chunk) use ($command) {
+            $this->outputs[$command] .= $chunk;
+        });
+
+        $process->stderr->on('data', function ($chunk) use ($command) {
+            $this->outputs[$command] .= $chunk;
         });
 
         $process->stdout->on('end', function () use ($deffered, $command) {

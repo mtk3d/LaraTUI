@@ -2,9 +2,6 @@
 
 namespace LaraTui\Windows;
 
-use LaraTui\Commands\FetchComposerVersionsCommand;
-use LaraTui\Commands\FetchLaravelVersionsCommand;
-use LaraTui\Commands\FetchPHPVersionsCommand;
 use LaraTui\Panes\OutdatedPackages;
 use LaraTui\Panes\Project;
 use LaraTui\Panes\ProjectView;

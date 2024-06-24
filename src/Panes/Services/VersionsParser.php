@@ -2,67 +2,50 @@
 
 namespace LaraTui\Panes\Services;
 
-use LaraTui\State\ComposerVersion;
-use LaraTui\State\InstalledPackages;
-use LaraTui\State\LaravelVersion;
-use LaraTui\State\LaravelVersions;
-use LaraTui\State\PHPVersions;
-use PhpTui\Tui\Style\Style;
+use LaraTui\State\VersionInfoLine;
+use LaraTui\State\VersionsInfo;
+use PhpTui\Tui\Extension\Core\Widget\Table\TableCell;
+use PhpTui\Tui\Extension\Core\Widget\Table\TableRow;
+use PhpTui\Tui\Extension\Core\Widget\TableWidget;
+use PhpTui\Tui\Layout\Constraint;
 use PhpTui\Tui\Text\Line;
 use PhpTui\Tui\Text\Span;
 
 class VersionsParser
 {
     public static function parseVersions(
-        ComposerVersion $composerVersion,
-        InstalledPackages $installedPackages,
-        LaravelVersions $laravelVersions,
-        PHPVersions $phpVersions,
+        VersionsInfo $versionsInfo,
     ) {
-        $laravelVersionsInfo = array_filter($installedPackages->installed, function ($package) {
-            return $package->name === 'laravel/framework';
-        });
+        $rows = collect($versionsInfo->lines)->map(function (VersionInfoLine $versionInfo) {
+            $iconSpan = match (true) {
+                $versionInfo->isSupported && $versionInfo->isLatest => Span::fromString('')->green(),
+                $versionInfo->isSupported => Span::fromString('')->yellow(),
+                default => Span::fromString('')->red(),
+            };
 
-        $laravelInfo = [];
+            $versionSpan = Span::fromString(" $versionInfo->version ");
+            $supportedSpan = Span::fromString($versionInfo->isSupported ? 'Supported' : 'Outdated');
+            $updateInfoSpan = Span::fromString(" $versionInfo->updateInfo")->darkGray();
 
-        if (! empty($laravelVersionsInfo)) {
-            $laravelInfo = array_values($laravelVersionsInfo)[0];
-        }
+            return TableRow::fromCells(
+                TableCell::fromString($versionInfo->name),
+                TableCell::fromLine(
+                    Line::fromSpans($iconSpan, $versionSpan),
+                ),
+                TableCell::fromLine(
+                    Line::fromSpans($supportedSpan, $updateInfoSpan),
+                ),
+            );
+        })->toArray();
 
-        $installedLaravelVersions = $laravelInfo->version;
-        $laravelMajor = null;
-        if (preg_match('/^v(\d+)\./', $installedLaravelVersions, $matches)) {
-            $laravelMajor = $matches[1];
-        }
-
-        $laravelVersion = array_filter($laravelVersions->data ?? [], function ($version) use ($laravelMajor) {
-            return $version->major == $laravelMajor;
-        });
-
-        $laravelVersionData = [];
-        if (! empty($laravelVersion)) {
-            /** @var LaravelVersion $laravelVersionData * */
-            $laravelVersionData = array_values($laravelVersion)[0];
-        }
-
-        $supported = $laravelVersionData->status ?? '' === 'active';
-
-        $color = Style::default();
-        if ($supported) {
-            if ('v'.$laravelVersionData->latest === $installedLaravelVersions) {
-                $color->green();
-            } else {
-                $color->yellow();
-            }
-        } else {
-            $color->red();
-        }
-
-        $versionSpan = Span::fromString(" $installedLaravelVersions ")->patchStyle($color);
-        $supportedSpan = Span::fromString($supported ? 'Supported' : 'Outdated')->patchStyle($color);
-
-        $latestSpan = Span::fromString(' Latest: '.$laravelVersionData->latest);
-
-        return Line::fromSpans($versionSpan, $supportedSpan, $latestSpan)->patchStyle($color);
+        return TableWidget::default()
+            ->widths(
+                Constraint::length(10),
+                Constraint::length(11),
+                Constraint::length(20),
+            )
+            ->rows(
+                ...$rows,
+            );
     }
 }

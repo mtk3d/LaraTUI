@@ -3,15 +3,12 @@
 namespace LaraTui\Mapper;
 
 use Brick\JsonMapper\NameMapper;
+use Illuminate\Support\Str;
 
 class CamelCaseToKebabCaseMapper implements NameMapper
 {
     public function mapName(string $name): string
     {
-        return preg_replace_callback(
-            '/[A-Z]/',
-            fn (array $matches) => '-'.strtolower($matches[0]),
-            $name,
-        );
+        return Str::kebab($name);
     }
 }

@@ -13,8 +13,8 @@ use function React\Promise\all;
 
 class FetchVersionsInfoCommand extends Command
 {
-
     const string LARAVEL_VERSIONS_URL = 'https://laravelversions.com/api/versions';
+
     const string PHP_VERSIONS_URL = 'https://php.watch/api/v1/versions';
 
     public function execute(array $data): void
@@ -57,6 +57,7 @@ class FetchVersionsInfoCommand extends Command
                 }),
         ])->then(function () {
             $this->eventBus->emit('PHPVersionsFetched');
+            $this->commandBus->dispatch(BuildVersionsInfo::class);
         });
     }
 }
