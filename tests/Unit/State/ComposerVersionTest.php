@@ -19,7 +19,7 @@ describe('test creating php and composer versions state', function () {
     test('can handle wrong command output', function () {
         $commandOutput = <<<'SHELL'
             Command "ddd" is not defined.
-            SHELL;
+        SHELL;
 
         $composerVersion = ComposerVersion::fromComposerVersionCommand($commandOutput);
 

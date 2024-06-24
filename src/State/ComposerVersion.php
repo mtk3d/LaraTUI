@@ -5,8 +5,8 @@ namespace LaraTui\State;
 class ComposerVersion
 {
     public function __construct(
-        public readonly string $composerVersion,
-        public readonly string $phpVersion,
+        public string $composerVersion,
+        public string $phpVersion,
     ) {}
 
     public static function fromComposerVersionCommand(string $composerOutput): self

@@ -34,7 +34,6 @@ class VersionsParser
             $laravelMajor = $matches[1];
         }
 
-        dump($laravelVersions);
         $laravelVersion = array_filter($laravelVersions->data ?? [], function ($version) use ($laravelMajor) {
             return $version->major == $laravelMajor;
         });

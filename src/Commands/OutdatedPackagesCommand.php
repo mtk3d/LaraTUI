@@ -2,19 +2,20 @@
 
 namespace LaraTui\Commands;
 
+use LaraTui\State\OutdatedPackages;
+
 class OutdatedPackagesCommand extends Command
 {
     public function init(): void {}
 
     public function execute(array $data): void
     {
-        $this->execCommand('composer outdated --format=json')
+        $this->execCommand('composer outdated --direct --format=json')
             ->then(function ($output) {
-                $packagesInfo = json_decode($output, true);
-
-                if (isset($packagesInfo['installed'])) {
-                    $this->state->set('outdated_packages', $packagesInfo['installed']);
-                }
+                $this->state->set(
+                    OutdatedPackages::class,
+                    OutdatedPackages::fromJson($output),
+                );
             });
     }
 }

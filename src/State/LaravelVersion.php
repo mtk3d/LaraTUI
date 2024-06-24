@@ -2,25 +2,18 @@
 
 namespace LaraTui\State;
 
-use Spatie\DataTransferObject\DataTransferObject;
-
-class LaravelVersion extends DataTransferObject
+class LaravelVersion
 {
-    public int $major;
-
-    public ?int $latest_minor;
-
-    public int $latest_patch;
-
-    public string $latest;
-
-    public string $released_at;
-
-    public ?string $ends_bugfixes_at;
-
-    public ?string $ends_securityfixes_at;
-
-    public array $supported_php;
-
-    public string $status;
+    /** @param string[]|null $supportedPhp */
+    public function __construct(
+        public int $major,
+        public ?int $latestMinor,
+        public ?int $latestPatch,
+        public string $latest,
+        public ?string $releasedAt,
+        public ?string $endsBugfixesAt,
+        public ?string $endsSecurityfixesAt,
+        public ?array $supportedPhp,
+        public string $status,
+    ) {}
 }

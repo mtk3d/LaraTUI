@@ -7,7 +7,7 @@ use Brick\JsonMapper\OnMissingProperties;
 use LaraTui\Mapper\CamelCaseToKebabCaseMapper;
 use LaraTui\Mapper\KebabCaseToCamelCaseMapper;
 
-class InstalledPackages
+class OutdatedPackages
 {
     /** @param Package[] $installed */
     public function __construct(
@@ -20,7 +20,6 @@ class InstalledPackages
             onMissingProperties: OnMissingProperties::SET_NULL,
             jsonToPhpNameMapper: new KebabCaseToCamelCaseMapper(),
             phpToJsonNameMapper: new CamelCaseToKebabCaseMapper(),
-        ))
-            ->map($data, self::class);
+        ))->map($data, self::class);
     }
 }

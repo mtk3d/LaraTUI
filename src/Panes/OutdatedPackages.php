@@ -4,6 +4,7 @@ namespace LaraTui\Panes;
 
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\OutdatedPackagesCommand;
+use LaraTui\State\OutdatedPackages as OutdatedPackagesState;
 use LaraTui\Traits\ListManager;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
@@ -42,22 +43,24 @@ class OutdatedPackages extends Pane
 
     private function updateListOfPackages(): void
     {
-        $outdatedPackages = $this->state->get('outdated_packages', []);
+        /** @var OutdatedPackagesState $outdatedPackages * */
+        $outdatedPackages = $this->state->get(OutdatedPackagesState::class, null);
 
-        $this->packages = array_map(function ($package) {
-            $name = $package['name'];
-            $version = $package['version'];
-            $latest = $package['latest'];
-            $lastestStatus = $package['latest-status'];
-            $prefix = match ($lastestStatus) {
-                'update-possible' => '<fg=yellow></>',
-                'semver-safe-update' => '<fg=red></>',
-            };
+        if ($outdatedPackages) {
+            $this->packages = array_map(function ($package) {
+                $name = $package->name;
+                $version = $package->version;
+                $latest = $package->latest;
+                $prefix = match ($package->latestStatus) {
+                    'update-possible' => '<fg=yellow></>',
+                    'semver-safe-update' => '<fg=red></>',
+                };
 
-            return ListItem::new(
-                Text::parse("$prefix $name $version -> $latest"),
-            );
-        }, $outdatedPackages);
+                return ListItem::new(
+                    Text::parse("$prefix $name $version -> $latest"),
+                );
+            }, $outdatedPackages->installed);
+        }
     }
 
     public function render(): Widget
@@ -75,14 +78,14 @@ class OutdatedPackages extends Pane
                 ->titleStyle(Style::default()->white())
                 ->widget(
                     empty($this->packages) ?
-                    ParagraphWidget::fromLines(Line::parse('<fg=darkGray>Loading...</>')) :
-                    ListWidget::default()
-                        ->highlightSymbol('')
-                        ->highlightStyle(Style::default()->lightRed())
-                        ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
-                        ->items(
-                            ...$this->packages,
-                        )
+                        ParagraphWidget::fromLines(Line::parse('<fg=darkGray>Loading...</>')) :
+                        ListWidget::default()
+                            ->highlightSymbol('')
+                            ->highlightStyle(Style::default()->lightRed())
+                            ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
+                            ->items(
+                                ...$this->packages,
+                            )
                 );
     }
 }
