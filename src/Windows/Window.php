@@ -7,7 +7,6 @@ use LaraTui\CommandAttributes\Periodic;
 use LaraTui\CommandBus;
 use LaraTui\EventBus;
 use LaraTui\State;
-use PhpTui\Term\KeyCode;
 use PhpTui\Tui\Widget\Widget;
 use React\EventLoop\LoopInterface;
 use ReflectionObject;
@@ -30,43 +29,9 @@ abstract class Window
 
     protected array $panesInstances = [];
 
-    private int $selectedPane = 0;
-
     public function __construct() {}
 
     protected function init(): void {}
-
-    #[KeyPressed(KeyCode::Tab, true)]
-    public function nextPane(): void
-    {
-        if ($this->selectedPane < count($this->panesInstances) - 1) {
-            $this->selectedPane++;
-        } else {
-            $this->selectedPane = 0;
-        }
-
-        $this->resetPaneSelection();
-        array_values($this->panesInstances)[$this->selectedPane]->selectPane();
-    }
-
-    #[KeyPressed(KeyCode::BackTab, true)]
-    public function previousPane(): void
-    {
-        if ($this->selectedPane > 0) {
-            $this->selectedPane--;
-        } else {
-            $this->selectedPane = count($this->panesInstances) - 1;
-        }
-        $this->resetPaneSelection();
-        array_values($this->panesInstances)[$this->selectedPane]->selectPane();
-    }
-
-    public function resetPaneSelection(): void
-    {
-        foreach ($this->panesInstances as $pane) {
-            $pane->deselectPane();
-        }
-    }
 
     public function showWindow(): void
     {
