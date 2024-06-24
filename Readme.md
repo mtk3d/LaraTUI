@@ -23,6 +23,7 @@ Project is something between PoC and pre-Alpha. There are no tests, some parts a
 - [x] start using php-tui events reading
 - [x] PHP and Composer versions check
 - [x] check migration status
+- [ ] achieve 70% tests coverage
 - [ ] add more info about versions updating
 - [ ] LaraTUI config to keep status of all projects
 - [ ] update packages functionality
