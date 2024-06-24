@@ -23,6 +23,7 @@ Project is something between PoC and pre-Alpha. There are no tests, some parts a
 - [x] start using php-tui events reading
 - [x] PHP and Composer versions check
 - [x] check migration status
+- [ ] add more info about versions updating
 - [ ] LaraTUI config to keep status of all projects
 - [ ] update packages functionality
 - [ ] automatic help popup on `?`
@@ -30,4 +31,5 @@ Project is something between PoC and pre-Alpha. There are no tests, some parts a
 - [ ] logs view
 - [ ] running artisan commands with quick commands
 - [ ] support other envs than laravel sail like laradock or vault
+- [ ] implement project creating window
 - [ ] implement composer audit execution
