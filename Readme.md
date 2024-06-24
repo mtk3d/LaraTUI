@@ -20,13 +20,14 @@ Project is something between PoC and pre-Alpha. There are no tests, some parts a
 - [x] read status of composer packages
 - [x] run docker compose up and read logs in app
 - [x] run migrations and handle output of it
-- [ ] start using php-tui events reading
-- [ ] PHP and Composer versions check
-- [ ] LaraTUI config to keep status of all project
-- [ ] update functionality
+- [x] start using php-tui events reading
+- [x] PHP and Composer versions check
+- [x] check migration status
+- [ ] LaraTUI config to keep status of all projects
+- [ ] update packages functionality
 - [ ] automatic help popup on `?`
 - [ ] envs view
+- [ ] logs view
 - [ ] running artisan commands with quick commands
-- [ ] check migration status
-- [ ] support other envs than laravel sail, laradock/vault
+- [ ] support other envs than laravel sail like laradock or vault
 - [ ] implement composer audit execution
