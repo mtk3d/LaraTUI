@@ -27,10 +27,10 @@ class EventBus
     }
 
     public function emit(
-        CharKeyEvent|CodedKeyEvent|FunctionKeyEvent $event,
+        CharKeyEvent|CodedKeyEvent|FunctionKeyEvent|string|int $event,
         array $data = []
     ): void {
-        $key = null;
+        $key = $event;
 
         if ($event instanceof CharKeyEvent) {
             $key = $event->char;

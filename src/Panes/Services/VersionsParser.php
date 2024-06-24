@@ -2,6 +2,7 @@
 
 namespace LaraTui\Panes\Services;
 
+use LaraTui\State\ComposerVersion;
 use LaraTui\State\InstalledPackages;
 use LaraTui\State\LaravelVersion;
 use LaraTui\State\LaravelVersions;
@@ -13,7 +14,7 @@ use PhpTui\Tui\Text\Span;
 class VersionsParser
 {
     public static function parseVersions(
-        string $existingPhp,
+        ComposerVersion $composerVersion,
         InstalledPackages $installedPackages,
         LaravelVersions $laravelVersions,
         PHPVersions $phpVersions,

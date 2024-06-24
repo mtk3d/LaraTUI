@@ -41,7 +41,7 @@ class Application
         $commandBus = new CommandBus();
         $state = new State();
         $browser = new Browser();
-        $commandProvider = new CommandProvider($state, $loop, $commandBus, $browser);
+        $commandProvider = new CommandProvider($state, $loop, $commandBus, $eventBus, $browser);
         $commandProvider->boot();
 
         return new self(

@@ -7,13 +7,13 @@ class LaravelVersion
     /** @param string[]|null $supportedPhp */
     public function __construct(
         public int $major,
-        public ?int $latestMinor,
-        public ?int $latestPatch,
+        public int|null $latestMinor,
+        public int $latestPatch,
         public string $latest,
-        public ?string $releasedAt,
-        public ?string $endsBugfixesAt,
-        public ?string $endsSecurityfixesAt,
-        public ?array $supportedPhp,
+        public string $releasedAt,
+        public string|null $endsBugfixesAt,
+        public string|null $endsSecurityfixesAt,
+        public array $supportedPhp,
         public string $status,
     ) {}
 }

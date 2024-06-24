@@ -2,6 +2,7 @@
 
 namespace LaraTui\Commands;
 
+use LaraTui\EventBus;
 use LaraTui\State;
 use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
@@ -17,6 +18,7 @@ abstract class Command
         protected readonly State $state,
         protected readonly LoopInterface $loop,
         protected readonly Browser $browser,
+        protected readonly EventBus $eventBus,
     ) {
         $this->init();
     }

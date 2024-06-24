@@ -5,6 +5,7 @@ namespace LaraTui;
 use LaraTui\Commands\FetchComposerVersionsCommand;
 use LaraTui\Commands\FetchLaravelVersionsCommand;
 use LaraTui\Commands\FetchPHPVersionsCommand;
+use LaraTui\Commands\FetchVersionsInfoCommand;
 use LaraTui\Commands\GetProjectNameCommand;
 use LaraTui\Commands\OutdatedPackagesCommand;
 use LaraTui\Commands\SailContainersCommand;
@@ -18,6 +19,7 @@ class CommandProvider
         protected readonly State $state,
         protected readonly LoopInterface $loop,
         protected readonly CommandBus $commandBus,
+        protected readonly EventBus $eventBus,
         protected readonly Browser $browser,
     ) {}
 
@@ -30,12 +32,13 @@ class CommandProvider
         $this->register(FetchLaravelVersionsCommand::class);
         $this->register(FetchComposerVersionsCommand::class);
         $this->register(FetchPHPVersionsCommand::class);
+        $this->register(FetchVersionsInfoCommand::class);
     }
 
     private function register(string $className): void
     {
         /** @var Command $command * */
-        $command = new $className($this->state, $this->loop, $this->browser);
+        $command = new $className($this->state, $this->loop, $this->browser, $this->eventBus);
         $this->commandBus->reactTo($command::class, [$command, 'execute']);
     }
 }

@@ -5,9 +5,9 @@ namespace LaraTui\Windows;
 use LaraTui\Commands\FetchComposerVersionsCommand;
 use LaraTui\Commands\FetchLaravelVersionsCommand;
 use LaraTui\Commands\FetchPHPVersionsCommand;
-use LaraTui\Panes\LaravelVersions;
 use LaraTui\Panes\OutdatedPackages;
 use LaraTui\Panes\Project;
+use LaraTui\Panes\ProjectView;
 use LaraTui\Panes\Services;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Layout\Constraint;
@@ -17,17 +17,14 @@ use PhpTui\Tui\Widget\Widget;
 class Main extends Window
 {
     protected array $panes = [
-        LaravelVersions::class,
+        Project::class,
         Services::class,
         OutdatedPackages::class,
-        Project::class,
+        ProjectView::class,
     ];
 
     public function init(): void
     {
-        $this->commandBus->dispatch(FetchPHPVersionsCommand::class);
-        $this->commandBus->dispatch(FetchLaravelVersionsCommand::class);
-        $this->commandBus->dispatch(FetchComposerVersionsCommand::class);
         array_values($this->panesInstances)[0]->selectPane();
     }
 
@@ -47,11 +44,11 @@ class Main extends Window
                         Constraint::percentage(50),
                         Constraint::percentage(50),
                     )->widgets(
-                        $this->renderPane(LaravelVersions::class),
+                        $this->renderPane(Project::class),
                         $this->renderPane(Services::class),
                         $this->renderPane(OutdatedPackages::class),
                     ),
-                $this->renderPane(Project::class),
+                $this->renderPane(ProjectView::class),
             );
     }
 }

@@ -7,9 +7,9 @@ class PHPVersion
     public function __construct(
         public int $versionId,
         public string $name,
-        public string $releaseDate,
-        public string $activeSupportEndDate,
-        public string $eolDate,
+        public string|null $releaseDate,
+        public string|null $activeSupportEndDate,
+        public string|null $eolDate,
         public bool $isEOLVersion,
         public bool $isSecureVersion,
         public bool $isLatestVersion,
