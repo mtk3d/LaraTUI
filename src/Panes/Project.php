@@ -14,7 +14,7 @@ use PhpTui\Tui\Widget\Widget;
 class Project extends Pane
 {
     public function init(): void {
-        $this->invoke(new GetProjectNameCommand());
+        $this->execute(new GetProjectNameCommand());
     }
 
     public function render(): Widget
@@ -23,7 +23,7 @@ class Project extends Pane
             BlockWidget::default()
                 ->borders(Borders::ALL)
                 ->borderType(BorderType::Rounded)
-                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->borderStyle($this->isActive ? Style::default()->red() : Style::default())
                 ->titles(
                     Title::fromString(' 󰫐 Project'),
                 )

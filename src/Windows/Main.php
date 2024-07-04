@@ -62,8 +62,9 @@ class Main extends Window
         if ($this->selectedPane > 0) {
             $this->selectedPane--;
         } else {
-            $this->selectedPane = count($this->panesInstances) - 1;
+            $this->selectedPane = count($this->panesNavigation) - 1;
         }
+
         $this->setPaneSelection();
     }
 

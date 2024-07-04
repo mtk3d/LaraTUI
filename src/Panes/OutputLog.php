@@ -19,7 +19,7 @@ class OutputLog extends Pane
                 ->borders(Borders::ALL)
                 ->borderType(BorderType::Rounded)
                 ->titles(Title::fromString('  Output log'))
-                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->borderStyle($this->isActive ? Style::default()->red() : Style::default())
                 ->widget(
                     ParagraphWidget::fromString($this->state->get('output_log', '')),
                 );

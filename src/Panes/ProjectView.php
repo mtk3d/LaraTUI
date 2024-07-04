@@ -33,8 +33,8 @@ class ProjectView extends Pane
     {
         $this->versions = ParagraphWidget::fromSpans(Span::fromString('Loading...')->darkGray());
 
-        $this->invoke(new FetchVersionsInfoCommand());
-        $this->invoke(new MigrationStatusCommand());
+        $this->execute(new FetchVersionsInfoCommand());
+        $this->execute(new MigrationStatusCommand());
 
         $this->eventBus->listen('BuildVersionsFinished', function () {
             $this->versions = VersionsParser::parseVersions(
@@ -119,7 +119,7 @@ class ProjectView extends Pane
                 ->borders(Borders::ALL)
                 ->borderType(BorderType::Rounded)
                 ->titles(...$this->titles())
-                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->borderStyle($this->isActive ? Style::default()->red() : Style::default())
                 ->widget(
                     GridWidget::default()
                         ->direction(Direction::Vertical)

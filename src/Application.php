@@ -3,7 +3,6 @@
 namespace LaraTui;
 
 use DI\Container;
-use LaraTui\Commands\GetProjectNameCommand;
 use LaraTui\Windows\Main;
 use LaraTui\Windows\Window;
 use PhpTui\Term\Actions;

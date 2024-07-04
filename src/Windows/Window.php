@@ -40,12 +40,6 @@ abstract class Window extends Component
         return $this->panesInstances[$paneClass]->render();
     }
 
-    protected function emit(string $event, array $data): void
-    {
-        $this->eventBus->emit($event, $data);
-    }
-
-
     public function unmount(): void
     {
         foreach ($this->timers as $timer) {

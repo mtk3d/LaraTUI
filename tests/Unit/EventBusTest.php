@@ -22,8 +22,8 @@ describe('test event bus', function () {
             $secondCalledWith = $data;
         };
 
-        $this->eventBus->listenTo('k', $firstHandler);
-        $this->eventBus->listenTo('k', $secondHandler);
+        $this->eventBus->listen('k', $firstHandler);
+        $this->eventBus->listen('k', $secondHandler);
 
         $this->eventBus->emit(CharKeyEvent::new('k'), ['some_data']);
 
@@ -38,7 +38,7 @@ describe('test event bus', function () {
             $calledWith = $data;
         };
 
-        $this->eventBus->listenTo(KeyCode::Enter, $handler);
+        $this->eventBus->listen(KeyCode::Enter, $handler);
 
         $this->eventBus->emit(CodedKeyEvent::new(KeyCode::Enter), ['some_data']);
 

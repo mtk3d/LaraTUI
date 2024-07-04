@@ -33,7 +33,7 @@ class OutdatedPackages extends Pane
     #[Periodic(30)]
     public function collectServicesData(): void
     {
-        $this->invoke(new OutdatedPackagesCommand());
+        $this->execute(new OutdatedPackagesCommand());
     }
 
     private function updateListOfPackages(): void
@@ -66,7 +66,7 @@ class OutdatedPackages extends Pane
             BlockWidget::default()
                 ->borders(Borders::ALL)
                 ->borderType(BorderType::Rounded)
-                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->borderStyle($this->isActive ? Style::default()->red() : Style::default())
                 ->titles(
                     Title::fromString('  Package updates'),
                 )
@@ -77,7 +77,7 @@ class OutdatedPackages extends Pane
                         ListWidget::default()
                             ->highlightSymbol('')
                             ->highlightStyle(Style::default()->lightRed())
-                            ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
+                            ->state(new ListState(0, $this->isActive ? $this->selectedItem : null))
                             ->items(
                                 ...$this->packages,
                             )

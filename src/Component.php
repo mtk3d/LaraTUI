@@ -37,7 +37,7 @@ abstract class Component
                 $eventBus->listen(
                     $attribute->key,
                     function () use ($attribute, $methodName) {
-                        if (! $this->isActive || $attribute->global) {
+                        if ($this->isActive || $attribute->global) {
                             $this->$methodName();
                         }
                     }
@@ -59,10 +59,15 @@ abstract class Component
         }
     }
 
-    public abstract function register(): void;
+    abstract public function register(): void;
 
     protected function execute(Command $command): void
     {
         $this->commandInvoker->invoke($command);
+    }
+
+    protected function emit(string $event, array $data): void
+    {
+        $this->eventBus->emit($event, $data);
     }
 }

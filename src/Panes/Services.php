@@ -81,7 +81,7 @@ class Services extends Pane
     #[Periodic(1)]
     public function collectServicesData(): void
     {
-        $this->invoke(new ServicesStatusCommand());
+        $this->execute(new ServicesStatusCommand());
     }
 
     private function combineServicesWithStatus(): array
@@ -131,7 +131,7 @@ class Services extends Pane
             BlockWidget::default()
                 ->borders(Borders::ALL)
                 ->borderType(BorderType::Rounded)
-                ->borderStyle($this->isSelected ? Style::default()->red() : Style::default())
+                ->borderStyle($this->isActive ? Style::default()->red() : Style::default())
                 ->titles(
                     Title::fromString(' 󰡨 Services'),
                 )
@@ -140,7 +140,7 @@ class Services extends Pane
                     ListWidget::default()
                         ->highlightSymbol('')
                         ->highlightStyle(Style::default()->lightRed())
-                        ->state(new ListState(0, $this->isSelected ? $this->selectedItem : null))
+                        ->state(new ListState(0, $this->isActive ? $this->selectedItem : null))
                         ->items(
                             ...$services,
                         )
