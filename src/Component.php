@@ -1,20 +1,17 @@
 <?php
 
-namespace LaraTui\Panes;
+namespace LaraTui;
 
+use DI\Container;
 use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
-use LaraTui\CommandInvoker;
 use LaraTui\Commands\Command;
-use LaraTui\EventBus;
-use LaraTui\State;
-use PhpTui\Tui\Widget\Widget;
 use React\EventLoop\LoopInterface;
 use ReflectionObject;
 
-abstract class Pane
+abstract class Component
 {
-    protected bool $isSelected = false;
+    protected $isActive = false;
 
     protected array $timers = [];
 
@@ -23,7 +20,12 @@ abstract class Pane
         protected readonly EventBus $eventBus,
         protected readonly State $state,
         protected readonly CommandInvoker $commandInvoker,
+        protected readonly Container $container,
     ) {
+        if (method_exists($this, 'init')) {
+            $this->container->call([$this, 'init']);
+        }
+
         $reflection = new ReflectionObject($this);
         $methods = $reflection->getMethods();
 
@@ -35,7 +37,7 @@ abstract class Pane
                 $eventBus->listen(
                     $attribute->key,
                     function () use ($attribute, $methodName) {
-                        if ($this->isSelected || $attribute->global) {
+                        if (! $this->isActive || $attribute->global) {
                             $this->$methodName();
                         }
                     }
@@ -50,38 +52,17 @@ abstract class Pane
             }
         }
 
-        $this->init();
+        $this->register();
+
+        if (method_exists($this, 'mount')) {
+            $this->container->call([$this, 'mount']);
+        }
     }
 
-    protected function init(): void {}
+    public abstract function register(): void;
 
-    public function selectPane(): void
-    {
-        $this->isSelected = true;
-    }
-
-    public function deselectPane(): void
-    {
-        $this->isSelected = false;
-    }
-
-    abstract public function render(): Widget;
-
-
-    protected function emit(string $event, array $data): void
-    {
-        $this->eventBus->emit($event, $data);
-    }
-
-    protected function invoke(Command $command): void
+    protected function execute(Command $command): void
     {
         $this->commandInvoker->invoke($command);
-    }
-
-    public function unmount(): void
-    {
-        foreach ($this->timers as $timer) {
-            $timer->stop();
-        }
     }
 }

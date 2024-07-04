@@ -36,7 +36,7 @@ class Main extends Window
 
     private bool $isMainSelected = false;
 
-    public function init(): void
+    public function mount(): void
     {
         $firstSidebarPaneClass = array_keys($this->panesNavigation)[0];
         $this->panesInstances[$firstSidebarPaneClass]->selectPane();

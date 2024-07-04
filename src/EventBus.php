@@ -11,7 +11,7 @@ class EventBus
 {
     private $register = [];
 
-    public function listenTo(
+    public function listen(
         KeyCode|string|int $event,
         callable $func
     ): void {

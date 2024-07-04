@@ -2,6 +2,7 @@
 
 namespace LaraTui;
 
+use DI\Container;
 use LaraTui\Commands\GetProjectNameCommand;
 use LaraTui\Windows\Main;
 use LaraTui\Windows\Window;
@@ -27,6 +28,7 @@ class Application
         private EventBus $eventBus,
         private CommandInvoker $commandInvoker,
         private State $state,
+        private Container $container,
     ) {
         $this->eventParser = new EventParser();
     }
@@ -49,10 +51,7 @@ class Application
 
     public function init(): void
     {
-        $this->commandInvoker->invoke(new GetProjectNameCommand());
-
-        $this->window = new Main();
-        $this->window->registerWindow($this->loop, $this->eventBus, $this->state, $this->commandInvoker);
+        $this->window = $this->container->make(Main::class);
     }
 
     public function startRendering(): void

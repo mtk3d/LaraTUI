@@ -36,7 +36,7 @@ class ProjectView extends Pane
         $this->invoke(new FetchVersionsInfoCommand());
         $this->invoke(new MigrationStatusCommand());
 
-        $this->eventBus->listenTo('BuildVersionsFinished', function () {
+        $this->eventBus->listen('BuildVersionsFinished', function () {
             $this->versions = VersionsParser::parseVersions(
                 $this->state->get(VersionsInfo::class),
             );

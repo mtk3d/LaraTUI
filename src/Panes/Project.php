@@ -2,6 +2,7 @@
 
 namespace LaraTui\Panes;
 
+use LaraTui\Commands\GetProjectNameCommand;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Style\Style;
@@ -12,7 +13,9 @@ use PhpTui\Tui\Widget\Widget;
 
 class Project extends Pane
 {
-    public function init(): void {}
+    public function init(): void {
+        $this->invoke(new GetProjectNameCommand());
+    }
 
     public function render(): Widget
     {
@@ -26,7 +29,7 @@ class Project extends Pane
                 )
                 ->titleStyle(Style::default()->white())
                 ->widget(
-                    ParagraphWidget::fromString($this->state->get('project_name')),
+                    ParagraphWidget::fromString($this->state->get('project_name', 'Loading...')),
                 );
     }
 }
