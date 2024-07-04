@@ -9,8 +9,7 @@ class MigrationStatus
     public function __construct(
         public readonly int $pending,
         public readonly int $all,
-    ) {
-    }
+    ) {}
 
     public static function fromMigrationStatusCommand(string $output): self
     {

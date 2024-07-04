@@ -2,28 +2,27 @@
 
 namespace LaraTui\Commands;
 
+use LaraTui\State;
 use React\ChildProcess\Process;
+use React\EventLoop\LoopInterface;
 
 class ServicesStatusCommand extends Command
 {
-    public function init(): void
+    public function __invoke(State $state, LoopInterface $loop): void
     {
-        $this->state->set('sail_services_status', 'Loading...');
-    }
+        $state->set('sail_services_status', 'Loading...');
 
-    public function execute(array $data): void
-    {
         $process = new Process('vendor/bin/sail ps -a --format=json | jq -s');
 
-        $process->start($this->loop);
+        $process->start($loop);
 
-        $process->stdout->on('data', function ($chunk) {
-            $this->state->append('services_status_stream', $chunk);
+        $process->stdout->on('data', function ($chunk) use ($state) {
+            $state->append('services_status_stream', $chunk);
         });
 
-        $process->stdout->on('end', function () {
-            $fixedJson = $this->state->get('services_status_stream');
-            $this->state->delete('services_status_stream');
+        $process->stdout->on('end', function () use ($state) {
+            $fixedJson = $state->get('services_status_stream');
+            $state->delete('services_status_stream');
             $servicesStatus = json_decode($fixedJson, true);
 
             $result = [];
@@ -32,7 +31,7 @@ class ServicesStatusCommand extends Command
                 $result[$service['Service']] = $service['State'];
             }
 
-            $this->state->set('services_status', $result);
+            $state->set('services_status', $result);
         });
     }
 }

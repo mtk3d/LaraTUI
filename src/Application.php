@@ -11,10 +11,7 @@ use PhpTui\Term\Event\CodedKeyEvent;
 use PhpTui\Term\EventParser;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
-use PhpTui\Tui\DisplayBuilder;
-use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
-use React\Http\Browser;
 use React\Stream\ReadableResourceStream;
 
 class Application
@@ -23,35 +20,15 @@ class Application
 
     private EventParser $eventParser;
 
-    private function __construct(
+    public function __construct(
         private LoopInterface $loop,
         private Terminal $terminal,
         private Display $display,
         private EventBus $eventBus,
-        private CommandBus $commandBus,
+        private CommandInvoker $commandInvoker,
         private State $state,
     ) {
         $this->eventParser = new EventParser();
-    }
-
-    public static function new(): self
-    {
-        $loop = Loop::get();
-        $eventBus = new EventBus();
-        $commandBus = new CommandBus();
-        $state = new State();
-        $browser = new Browser();
-        $commandProvider = new CommandProvider($state, $loop, $commandBus, $eventBus, $browser);
-        $commandProvider->boot();
-
-        return new self(
-            $loop,
-            Terminal::new(),
-            DisplayBuilder::default()->build(),
-            $eventBus,
-            $commandBus,
-            $state,
-        );
     }
 
     public function run(): int
@@ -72,11 +49,10 @@ class Application
 
     public function init(): void
     {
-        $this->commandBus
-            ->dispatch(GetProjectNameCommand::class);
+        $this->commandInvoker->invoke(new GetProjectNameCommand());
 
         $this->window = new Main();
-        $this->window->registerWindow($this->loop, $this->eventBus, $this->commandBus, $this->state);
+        $this->window->registerWindow($this->loop, $this->eventBus, $this->state, $this->commandInvoker);
     }
 
     public function startRendering(): void

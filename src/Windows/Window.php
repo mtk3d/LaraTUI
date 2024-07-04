@@ -4,7 +4,8 @@ namespace LaraTui\Windows;
 
 use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
-use LaraTui\CommandBus;
+use LaraTui\CommandInvoker;
+use LaraTui\Commands\Command;
 use LaraTui\EventBus;
 use LaraTui\State;
 use PhpTui\Tui\Widget\Widget;
@@ -17,7 +18,7 @@ abstract class Window
 
     protected EventBus $eventBus;
 
-    protected CommandBus $commandBus;
+    protected CommandInvoker $commandInvoker;
 
     protected LoopInterface $loop;
 
@@ -48,8 +49,8 @@ abstract class Window
     public function registerWindow(
         LoopInterface $loop,
         EventBus $eventBus,
-        CommandBus $commandBus,
         State $state,
+        CommandInvoker $commandInvoker,
     ): void {
         $reflection = new ReflectionObject($this);
         $methods = $reflection->getMethods();
@@ -78,9 +79,9 @@ abstract class Window
         }
 
         $this->eventBus = $eventBus;
-        $this->commandBus = $commandBus;
         $this->state = $state;
         $this->loop = $loop;
+        $this->commandInvoker = $commandInvoker;
 
         $this->registerPanes();
 
@@ -91,7 +92,7 @@ abstract class Window
     {
         foreach ($this->panes as $paneClass) {
             $this->panesInstances[$paneClass] = new $paneClass();
-            $this->panesInstances[$paneClass]->registerPane($this->loop, $this->eventBus, $this->commandBus, $this->state);
+            $this->panesInstances[$paneClass]->registerPane($this->loop, $this->eventBus, $this->state, $this->commandInvoker);
         }
     }
 
@@ -107,6 +108,11 @@ abstract class Window
     protected function emit(string $event, array $data): void
     {
         $this->eventBus->emit($event, $data);
+    }
+
+    protected function execute(Command $command): void
+    {
+        $this->commandInvoker->invoke($command);
     }
 
     public function unmount(): void

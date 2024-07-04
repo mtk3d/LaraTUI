@@ -4,7 +4,7 @@ use LaraTui\State\MigrationStatus;
 
 describe('test migration status state', function () {
     test('can be build from artisan migrate status command', function () {
-        $output = <<<TEXT
+        $output = <<<'TEXT'
 
           Migration name .............................................. Batch / Status  
           0001_01_01_000000_create_users_table ............................... [1] Ran  

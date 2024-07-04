@@ -4,7 +4,8 @@ namespace LaraTui\Panes;
 
 use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\CommandAttributes\Periodic;
-use LaraTui\CommandBus;
+use LaraTui\CommandInvoker;
+use LaraTui\Commands\Command;
 use LaraTui\EventBus;
 use LaraTui\State;
 use PhpTui\Tui\Widget\Widget;
@@ -17,7 +18,7 @@ abstract class Pane
 
     protected EventBus $eventBus;
 
-    protected CommandBus $commandBus;
+    protected CommandInvoker $commandInvoker;
 
     protected State $state;
 
@@ -44,8 +45,8 @@ abstract class Pane
     public function registerPane(
         LoopInterface $loop,
         EventBus $eventBus,
-        CommandBus $commandBus,
         State $state,
+        CommandInvoker $commandInvoker,
     ): void {
         $reflection = new ReflectionObject($this);
         $methods = $reflection->getMethods();
@@ -74,9 +75,9 @@ abstract class Pane
         }
 
         $this->eventBus = $eventBus;
-        $this->commandBus = $commandBus;
         $this->state = $state;
         $this->loop = $loop;
+        $this->commandInvoker = $commandInvoker;
 
         $this->init();
     }
@@ -84,6 +85,11 @@ abstract class Pane
     protected function emit(string $event, array $data): void
     {
         $this->eventBus->emit($event, $data);
+    }
+
+    protected function invoke(Command $command): void
+    {
+        $this->commandInvoker->invoke($command);
     }
 
     public function unmount(): void

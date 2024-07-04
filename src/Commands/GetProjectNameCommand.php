@@ -2,15 +2,13 @@
 
 namespace LaraTui\Commands;
 
+use LaraTui\State;
+
 class GetProjectNameCommand extends Command
 {
-    public function init(): void
+    public function __invoke(State $state): void
     {
-        $this->state->set('project_name', 'Loading...');
-    }
-
-    public function execute(array $data): void
-    {
-        $this->state->set('project_name', basename(getcwd()));
+        $state->set('project_name', 'Loading...');
+        $state->set('project_name', basename(getcwd()));
     }
 }

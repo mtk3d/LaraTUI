@@ -22,7 +22,8 @@
         "react/promise": "^3.2.0",
         "brick/json-mapper": "^0.1.1",
         "illuminate/collections": "^11.11",
-        "illuminate/support": "^11.11"
+        "illuminate/support": "^11.11",
+        "php-di/php-di": "^7.0"
     },
     "require-dev": {
         "laravel/pint": "^1.16",

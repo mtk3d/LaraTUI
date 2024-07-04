@@ -81,7 +81,7 @@ class Services extends Pane
     #[Periodic(1)]
     public function collectServicesData(): void
     {
-        $this->commandBus->dispatch(ServicesStatusCommand::class);
+        $this->invoke(new ServicesStatusCommand());
     }
 
     private function combineServicesWithStatus(): array

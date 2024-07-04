@@ -2,11 +2,16 @@
 
 namespace LaraTui\Commands;
 
+use LaraTui\CommandInvoker;
+use LaraTui\EventBus;
+use LaraTui\State;
 use LaraTui\State\ComposerVersion;
 use LaraTui\State\InstalledPackages;
 use LaraTui\State\LaravelVersions;
 use LaraTui\State\OutdatedPackages;
 use LaraTui\State\PHPVersions;
+use LaraTui\SystemExec;
+use React\Http\Browser;
 use React\Http\Message\Response;
 
 use function React\Promise\all;
@@ -17,47 +22,47 @@ class FetchVersionsInfoCommand extends Command
 
     const string PHP_VERSIONS_URL = 'https://php.watch/api/v1/versions';
 
-    public function execute(array $data): void
+    public function __invoke(State $state, Browser $browser, EventBus $eventBus, CommandInvoker $commandInvoker, SystemExec $systemExec): void
     {
         all([
-            $this->browser
+            $browser
                 ->get(self::LARAVEL_VERSIONS_URL)
-                ->then(function (Response $response) {
+                ->then(function (Response $response) use ($state) {
                     $body = $response->getBody()->getContents();
-                    $this->state->set(
+                    $state->set(
                         LaravelVersions::class,
                         LaravelVersions::fromResponseBody($body),
                     );
                 }),
-            $this->execCommand('composer show --direct --format=json')
-                ->then(function ($output) {
-                    $this->state->set(
+            $systemExec('composer', 'show', '--direct', '--format=json')
+                ->then(function ($output) use ($state) {
+                    $state->set(
                         InstalledPackages::class,
                         InstalledPackages::fromJson($output),
                     );
                 }),
-            $this->browser->get(self::PHP_VERSIONS_URL)
-                ->then(function (Response $response) {
+            $browser->get(self::PHP_VERSIONS_URL)
+                ->then(function (Response $response) use ($state) {
                     $body = $response->getBody()->getContents();
-                    $this->state->set(PHPVersions::class, PHPVersions::fromResponseBody($body));
+                    $state->set(PHPVersions::class, PHPVersions::fromResponseBody($body));
                 }),
-            $this->execCommand('composer outdated --direct --format=json')
-                ->then(function ($output) {
-                    $this->state->set(
+            $systemExec('composer', 'outdated', '--direct', '--format=json')
+                ->then(function ($output) use ($state) {
+                    $state->set(
                         OutdatedPackages::class,
                         OutdatedPackages::fromJson($output),
                     );
                 }),
-            $this->execCommand('composer --version')
-                ->then(function ($output) {
-                    $this->state->set(
+            $systemExec('composer', '--version')
+                ->then(function ($output) use ($state) {
+                    $state->set(
                         ComposerVersion::class,
                         ComposerVersion::fromComposerVersionCommand($output),
                     );
                 }),
-        ])->then(function () {
-            $this->eventBus->emit('PHPVersionsFetched');
-            $this->commandBus->dispatch(BuildVersionsInfo::class);
+        ])->then(function () use ($eventBus, $commandInvoker) {
+            $eventBus->emit('PHPVersionsFetched');
+            $commandInvoker->invoke(new BuildVersionsInfo());
         });
     }
 }

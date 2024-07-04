@@ -25,11 +25,6 @@ class OutdatedPackages extends Pane
 
     private array $packages = [];
 
-    public function init(): void
-    {
-        $this->collectServicesData();
-    }
-
     protected function items(): array
     {
         return $this->packages;
@@ -38,7 +33,7 @@ class OutdatedPackages extends Pane
     #[Periodic(30)]
     public function collectServicesData(): void
     {
-        $this->commandBus->dispatch(OutdatedPackagesCommand::class);
+        $this->invoke(new OutdatedPackagesCommand());
     }
 
     private function updateListOfPackages(): void

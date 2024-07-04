@@ -33,8 +33,8 @@ class ProjectView extends Pane
     {
         $this->versions = ParagraphWidget::fromSpans(Span::fromString('Loading...')->darkGray());
 
-        $this->commandBus->dispatch(FetchVersionsInfoCommand::class);
-        $this->commandBus->dispatch(MigrationStatusCommand::class);
+        $this->invoke(new FetchVersionsInfoCommand());
+        $this->invoke(new MigrationStatusCommand());
 
         $this->eventBus->listenTo('BuildVersionsFinished', function () {
             $this->versions = VersionsParser::parseVersions(
