@@ -13,7 +13,8 @@ use PhpTui\Tui\Widget\Widget;
 
 class Project extends Pane
 {
-    public function init(): void {
+    public function init(): void
+    {
         $this->execute(new GetProjectNameCommand());
     }
 

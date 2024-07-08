@@ -4,6 +4,7 @@ namespace LaraTui;
 
 use DI\Container;
 use LaraTui\Windows\Main;
+use LaraTui\Windows\Popup;
 use LaraTui\Windows\Window;
 use PhpTui\Term\Actions;
 use PhpTui\Term\Event\CharKeyEvent;
@@ -11,12 +12,16 @@ use PhpTui\Term\Event\CodedKeyEvent;
 use PhpTui\Term\EventParser;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
+use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
+use PhpTui\Tui\Extension\Core\Widget\CompositeWidget;
 use React\EventLoop\LoopInterface;
 use React\Stream\ReadableResourceStream;
 
 class Application
 {
     private Window $window;
+
+    private Popup $popup;
 
     private EventParser $eventParser;
 
@@ -51,13 +56,17 @@ class Application
     public function init(): void
     {
         $this->window = $this->container->make(Main::class);
+        $this->popup = $this->container->make(Popup::class);
     }
 
     public function startRendering(): void
     {
         $this->loop->addPeriodicTimer(1 / 60, function () {
             $this->display->draw(
-                $this->window->render(),
+                CompositeWidget::fromWidgets(
+                    $this->window->render(),
+                    $this->popup->isActive() ? $this->popup->render() : BlockWidget::default(),
+                ),
             );
         });
     }

@@ -61,13 +61,18 @@ abstract class Component
 
     abstract public function register(): void;
 
-    protected function execute(Command $command): void
+    protected function execute(Command $command): mixed
     {
-        $this->commandInvoker->invoke($command);
+        return $this->commandInvoker->invoke($command);
     }
 
-    protected function emit(string $event, array $data): void
+    protected function emit(string $event, array $data = []): void
     {
         $this->eventBus->emit($event, $data);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
     }
 }

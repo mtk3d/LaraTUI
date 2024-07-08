@@ -34,7 +34,7 @@ class FetchVersionsInfoCommand extends Command
                         LaravelVersions::fromResponseBody($body),
                     );
                 }),
-            $systemExec('composer', 'show', '--direct', '--format=json')
+            $systemExec(['composer', 'show', '--direct', '--format=json'])
                 ->then(function ($output) use ($state) {
                     $state->set(
                         InstalledPackages::class,
@@ -46,14 +46,14 @@ class FetchVersionsInfoCommand extends Command
                     $body = $response->getBody()->getContents();
                     $state->set(PHPVersions::class, PHPVersions::fromResponseBody($body));
                 }),
-            $systemExec('composer', 'outdated', '--direct', '--format=json')
+            $systemExec(['composer', 'outdated', '--direct', '--format=json'])
                 ->then(function ($output) use ($state) {
                     $state->set(
                         OutdatedPackages::class,
                         OutdatedPackages::fromJson($output),
                     );
                 }),
-            $systemExec('composer', '--version')
+            $systemExec(['composer', '--version'])
                 ->then(function ($output) use ($state) {
                     $state->set(
                         ComposerVersion::class,

@@ -3,8 +3,10 @@
 namespace LaraTui\Panes;
 
 use Illuminate\Support\Str;
+use LaraTui\CommandAttributes\KeyPressed;
 use LaraTui\Commands\FetchVersionsInfoCommand;
 use LaraTui\Commands\MigrationStatusCommand;
+use LaraTui\Commands\UpdatePackagesCommand;
 use LaraTui\Panes\Services\VersionsParser;
 use LaraTui\State\MigrationStatus;
 use LaraTui\State\OutdatedPackages;
@@ -48,6 +50,13 @@ class ProjectView extends Pane
         return [
             Line::fromString('  Condition '), Line::fromString('  Logs '), Line::fromString('  Artisan '), Line::fromString(' 󰯷 envs'),
         ];
+    }
+
+    #[KeyPressed('u')]
+    public function update(): void
+    {
+        $this->execute(new UpdatePackagesCommand());
+        $this->emit('open_dialog');
     }
 
     public function titles(): array

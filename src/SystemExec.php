@@ -9,32 +9,38 @@ use React\Promise\PromiseInterface;
 
 class SystemExec
 {
-    private array $outputs = [];
-
     public function __construct(
-        private readonly LoopInterface $loop
+        private readonly LoopInterface $loop,
+        private readonly State $state,
     ) {}
 
-    public function __invoke(string ...$command): PromiseInterface
+    /**
+     * @param  string[]  $command
+     */
+    public function __invoke(array $command, ?string $stateKey = null): PromiseInterface
     {
-        $key = uniqid(implode('-', $command));
+        $key = $stateKey ?? uniqid(implode('-', $command));
         $command = implode(' ', array_map('escapeshellarg', $command));
 
         $deffered = new Deferred();
         $process = new Process($command);
         $process->start($this->loop);
-        $this->outputs[$key] = '';
+        $this->state->set($key, '');
 
         $process->stdout->on('data', function ($chunk) use ($key) {
-            $this->outputs[$key] .= $chunk;
+            $this->state->append($key, $chunk);
         });
 
         $process->stderr->on('data', function ($chunk) use ($key) {
-            $this->outputs[$key] .= $chunk;
+            $this->state->append($key, $chunk);
         });
 
         $process->stdout->on('end', function () use ($deffered, $key) {
-            $deffered->resolve($this->outputs[$key]);
+            $deffered->resolve($this->state->get($key));
+        });
+
+        $process->on('exit', function () use ($deffered, $key) {
+            $deffered->resolve($this->state->get($key));
         });
 
         return $deffered->promise();

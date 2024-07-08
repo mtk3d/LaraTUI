@@ -11,8 +11,8 @@ class CommandInvoker
         private readonly InvokerInterface $invoker,
     ) {}
 
-    public function invoke(Command $command): void
+    public function invoke(Command $command): mixed
     {
-        $this->invoker->call($command);
+        return $this->invoker->call($command);
     }
 }

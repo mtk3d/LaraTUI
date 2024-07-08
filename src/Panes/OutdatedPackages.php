@@ -25,6 +25,16 @@ class OutdatedPackages extends Pane
 
     private array $packages = [];
 
+    private bool $isLoading;
+
+    private int $d = 0;
+
+    public function init(): void
+    {
+        $this->isLoading = true;
+        $this->collectServicesData();
+    }
+
     protected function items(): array
     {
         return $this->packages;
@@ -33,7 +43,8 @@ class OutdatedPackages extends Pane
     #[Periodic(30)]
     public function collectServicesData(): void
     {
-        $this->execute(new OutdatedPackagesCommand());
+        $this->execute(new OutdatedPackagesCommand())
+            ->then(fn () => $this->isLoading = false);
     }
 
     private function updateListOfPackages(): void
@@ -72,15 +83,22 @@ class OutdatedPackages extends Pane
                 )
                 ->titleStyle(Style::default()->white())
                 ->widget(
-                    empty($this->packages) ?
-                        ParagraphWidget::fromLines(Line::parse('<fg=darkGray>Loading...</>')) :
-                        ListWidget::default()
-                            ->highlightSymbol('')
-                            ->highlightStyle(Style::default()->lightRed())
-                            ->state(new ListState(0, $this->isActive ? $this->selectedItem : null))
-                            ->items(
-                                ...$this->packages,
-                            )
+                    $this->isLoading ?
+                    ParagraphWidget::fromLines(
+                        Line::parse('<fg=darkGray>Loading...</>')
+                    ) : (
+                        empty($this->packages) ?
+                        ParagraphWidget::fromLines(
+                            Line::parse('All your packages are up to date')
+                        ) :
+                            ListWidget::default()
+                                ->highlightSymbol('')
+                                ->highlightStyle(Style::default()->lightRed())
+                                ->state(new ListState(0, $this->isActive ? $this->selectedItem : null))
+                                ->items(
+                                    ...$this->packages,
+                                )
+                    )
                 );
     }
 }
