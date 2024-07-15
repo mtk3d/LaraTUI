@@ -9,14 +9,16 @@ use LaraTui\Panes\Project;
 use LaraTui\Panes\ProjectView;
 use LaraTui\Panes\Services;
 use PhpTui\Term\KeyCode;
+use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Layout\Constraint;
+use PhpTui\Tui\Layout\Layout;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
 
 class Main extends Window
 {
-    protected array $panes = [
+    protected array $components = [
         Project::class,
         Services::class,
         OutdatedPackages::class,
@@ -39,7 +41,7 @@ class Main extends Window
     public function mount(): void
     {
         $firstSidebarPaneClass = array_keys($this->panesNavigation)[0];
-        $this->panesInstances[$firstSidebarPaneClass]->selectPane();
+        $this->componentInstances[$firstSidebarPaneClass]->activate();
     }
 
     #[KeyPressed(KeyCode::Tab, true)]
@@ -84,41 +86,54 @@ class Main extends Window
 
     public function setPaneSelection(): void
     {
-        foreach ($this->panesInstances as $pane) {
-            $pane->deselectPane();
+        foreach ($this->componentInstances as $pane) {
+            $pane->deactivate();
         }
 
         $selectedPaneClass = array_keys($this->panesNavigation)[$this->selectedPane];
 
         if (! $this->isMainSelected) {
-            $this->panesInstances[$selectedPaneClass]->selectPane();
+            $this->componentInstances[$selectedPaneClass]->activate();
             $this->mainPane = $this->panesNavigation[$selectedPaneClass];
         } else {
-            $this->panesInstances[$this->mainPane]->selectPane();
+            $this->componentInstances[$this->mainPane]->activate();
         }
     }
 
-    public function render(): Widget
+    public function render(Area $area): Widget
     {
+        $horizontalConstraints = [
+            Constraint::percentage(30),
+            Constraint::percentage(70),
+        ];
+        $horizontalLayout = Layout::default()
+            ->direction(Direction::Horizontal)
+            ->constraints($horizontalConstraints)
+            ->split($area);
+
+        $verticalConstraints = [
+            Constraint::length(3),
+            Constraint::percentage(50),
+            Constraint::percentage(50),
+        ];
+        $verticalLayout = Layout::default()
+            ->direction(Direction::Vertical)
+            ->constraints($verticalConstraints)
+            ->split($horizontalLayout->get(0));
+
         return GridWidget::default()
             ->direction(Direction::Horizontal)
-            ->constraints(
-                Constraint::percentage(30),
-                Constraint::percentage(70),
-            )
+            ->constraints(...$horizontalConstraints)
             ->widgets(
                 GridWidget::default()
                     ->direction(Direction::Vertical)
-                    ->constraints(
-                        Constraint::length(3),
-                        Constraint::percentage(50),
-                        Constraint::percentage(50),
-                    )->widgets(
-                        $this->renderPane(Project::class),
-                        $this->renderPane(Services::class),
-                        $this->renderPane(OutdatedPackages::class),
+                    ->constraints(...$verticalConstraints)
+                    ->widgets(
+                        $this->renderComponent(Project::class, $verticalLayout->get(0)),
+                        $this->renderComponent(Services::class, $verticalLayout->get(1)),
+                        $this->renderComponent(OutdatedPackages::class, $verticalLayout->get(2)),
                     ),
-                $this->renderPane($this->mainPane),
+                $this->renderComponent($this->mainPane, $horizontalLayout->get(1)),
             );
     }
 }

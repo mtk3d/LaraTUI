@@ -5,6 +5,7 @@ namespace LaraTui;
 use PhpTui\Term\Event\CharKeyEvent;
 use PhpTui\Term\Event\CodedKeyEvent;
 use PhpTui\Term\Event\FunctionKeyEvent;
+use PhpTui\Term\Event\MouseEvent;
 use PhpTui\Term\KeyCode;
 
 class EventBus
@@ -13,7 +14,7 @@ class EventBus
 
     public function listen(
         KeyCode|string|int $event,
-        callable $func
+        callable $func,
     ): void {
         if ($event instanceof KeyCode) {
             $event = $event->name;
@@ -27,10 +28,16 @@ class EventBus
     }
 
     public function emit(
-        CharKeyEvent|CodedKeyEvent|FunctionKeyEvent|string|int $event,
+        CharKeyEvent|CodedKeyEvent|FunctionKeyEvent|MouseEvent|string|int $event,
         array $data = []
     ): void {
         $key = $event;
+        if ($event instanceof CharKeyEvent) {
+            $data = [
+                'modifiers' => $event->modifiers,
+                ...$data,
+            ];
+        }
 
         if ($event instanceof CharKeyEvent) {
             $key = $event->char;
@@ -42,6 +49,13 @@ class EventBus
 
         if ($event instanceof FunctionKeyEvent) {
             $key = "F{$event->number}";
+        }
+
+        if ($event instanceof MouseEvent) {
+            $key = "Mouse";
+            $data = [
+                'event' => $event,
+            ];
         }
 
         if (! isset($this->register[$key])) {

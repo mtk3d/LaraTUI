@@ -19,8 +19,6 @@ class OutdatedPackagesCommand extends Command
                     OutdatedPackages::class,
                     OutdatedPackages::fromJson($output),
                 );
-
-                return null;
             });
     }
 }

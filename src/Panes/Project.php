@@ -3,6 +3,7 @@
 namespace LaraTui\Panes;
 
 use LaraTui\Commands\GetProjectNameCommand;
+use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Style\Style;
@@ -18,8 +19,10 @@ class Project extends Pane
         $this->execute(new GetProjectNameCommand());
     }
 
-    public function render(): Widget
+    public function render(Area $area): Widget
     {
+        $this->area = $area;
+
         return
             BlockWidget::default()
                 ->borders(Borders::ALL)

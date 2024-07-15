@@ -10,6 +10,8 @@ trait TabManager
 
     abstract public function tabs(): array;
 
+    abstract public function setTab(int $tab): void;
+
     protected function tabsCount(): int
     {
         return count($this->tabs());
@@ -21,6 +23,8 @@ trait TabManager
         if ($this->currentTab < $this->tabsCount() - 1) {
             $this->currentTab++;
         }
+
+        $this->setTab($this->currentTab);
     }
 
     #[KeyPressed('[')]
@@ -29,5 +33,7 @@ trait TabManager
         if ($this->currentTab > 0) {
             $this->currentTab--;
         }
+
+        $this->setTab($this->currentTab);
     }
 }

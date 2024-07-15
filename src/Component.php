@@ -4,14 +4,21 @@ namespace LaraTui;
 
 use DI\Container;
 use LaraTui\CommandAttributes\KeyPressed;
+use LaraTui\CommandAttributes\Mouse;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\Command;
+use PhpTui\Tui\Display\Area;
+use PhpTui\Tui\Widget\Widget;
 use React\EventLoop\LoopInterface;
 use ReflectionObject;
 
 abstract class Component
 {
-    protected $isActive = false;
+    protected array $components = [];
+
+    protected array $componentInstances = [];
+
+    protected bool $isActive = false;
 
     protected array $timers = [];
 
@@ -30,15 +37,19 @@ abstract class Component
         $methods = $reflection->getMethods();
 
         foreach ($methods as $method) {
-            $attributes = $method->getAttributes(KeyPressed::class);
+            $attributes = [
+                ...$method->getAttributes(KeyPressed::class),
+                ...$method->getAttributes(Mouse::class),
+            ];
+
             foreach ($attributes as $attribute) {
                 $methodName = $method->getName();
                 $attribute = $attribute->newInstance();
                 $eventBus->listen(
                     $attribute->key,
-                    function () use ($attribute, $methodName) {
+                    function (array $data) use ($attribute, $methodName) {
                         if ($this->isActive || $attribute->global) {
-                            $this->$methodName();
+                            $this->$methodName($data);
                         }
                     }
                 );
@@ -52,14 +63,30 @@ abstract class Component
             }
         }
 
-        $this->register();
+        $this->registerComponents();
 
         if (method_exists($this, 'mount')) {
             $this->container->call([$this, 'mount']);
         }
     }
 
-    abstract public function register(): void;
+    private function registerComponents(): void
+    {
+        foreach ($this->components as $component) {
+            $this->componentInstances[$component] = $this->container
+                ->make($component);
+        }
+    }
+
+    protected function renderComponent(string $component, Area $area): Widget
+    {
+        return $this->getComponent($component)->render($area);
+    }
+
+    protected function getComponent(string $component)
+    {
+        return $this->componentInstances[$component];
+    }
 
     protected function execute(Command $command): mixed
     {
@@ -75,4 +102,16 @@ abstract class Component
     {
         return $this->isActive;
     }
+
+    public function activate(): void
+    {
+        $this->isActive = true;
+    }
+
+    public function deactivate(): void
+    {
+        $this->isActive = false;
+    }
+
+    abstract public function render(Area $area): Widget;
 }

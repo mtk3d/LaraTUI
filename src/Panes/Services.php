@@ -2,9 +2,12 @@
 
 namespace LaraTui\Panes;
 
+use LaraTui\CommandAttributes\Mouse;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\ServicesStatusCommand;
 use LaraTui\Traits\ListManager;
+use PhpTui\Term\MouseEventKind;
+use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
 use PhpTui\Tui\Extension\Core\Widget\List\ListState;
@@ -107,8 +110,10 @@ class Services extends Pane
         return [...$enabled, ...$disabled];
     }
 
-    public function render(): Widget
+    public function render(Area $area): Widget
     {
+        $this->area = $area;
+
         $services = array_map(
             function ($service) {
                 $icon = $service['icon'];

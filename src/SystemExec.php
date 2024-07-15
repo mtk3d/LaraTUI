@@ -9,6 +9,8 @@ use React\Promise\PromiseInterface;
 
 class SystemExec
 {
+    private static array $processes = [];
+
     public function __construct(
         private readonly LoopInterface $loop,
         private readonly State $state,
@@ -24,6 +26,7 @@ class SystemExec
 
         $deffered = new Deferred();
         $process = new Process($command);
+        self::$processes[$command] = $process;
         $process->start($this->loop);
         $this->state->set($key, '');
 
@@ -35,8 +38,9 @@ class SystemExec
             $this->state->append($key, $chunk);
         });
 
-        $process->stdout->on('end', function () use ($deffered, $key) {
+        $process->stdout->on('end', function () use ($deffered, $command, $key) {
             $deffered->resolve($this->state->get($key));
+            unset(self::$processes[$command]);
         });
 
         $process->on('exit', function () use ($deffered, $key) {
@@ -44,5 +48,12 @@ class SystemExec
         });
 
         return $deffered->promise();
+    }
+
+    public function terminateAll(): void
+    {
+        foreach (self::$processes as $process) {
+            $process->terminate();
+        }
     }
 }

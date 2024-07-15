@@ -6,6 +6,7 @@ use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\OutdatedPackagesCommand;
 use LaraTui\State\OutdatedPackages as OutdatedPackagesState;
 use LaraTui\Traits\ListManager;
+use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
 use PhpTui\Tui\Extension\Core\Widget\List\ListState;
@@ -69,8 +70,9 @@ class OutdatedPackages extends Pane
         }
     }
 
-    public function render(): Widget
+    public function render(Area $area): Widget
     {
+        $this->area = $area;
         $this->updateListOfPackages();
 
         return

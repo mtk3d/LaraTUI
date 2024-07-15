@@ -13,7 +13,6 @@ class ServicesStatusCommand extends Command
             ->then(function (string $output) use ($state) {
                 $servicesStatus = json_decode($output, true);
                 $statuses = array_column($servicesStatus, 'State', 'Service');
-
                 $state->set('services_status', $statuses);
             });
     }

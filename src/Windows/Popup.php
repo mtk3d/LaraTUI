@@ -4,6 +4,7 @@ namespace LaraTui\Windows;
 
 use LaraTui\CommandAttributes\KeyPressed;
 use PhpTui\Term\KeyCode;
+use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Display\Display;
 use PhpTui\Tui\Extension\Core\Widget\Block\Padding;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
@@ -21,16 +22,16 @@ class Popup extends Window
     {
         $this->display = $display;
         $this->eventBus
-            ->listen('open_dialog', fn () => $this->showWindow());
+            ->listen('open_dialog', fn () => $this->activate());
     }
 
     #[KeyPressed(KeyCode::Esc)]
     public function hide(): void
     {
-        $this->hideWindow();
+        $this->deactivate();
     }
 
-    public function render(): Widget
+    public function render(Area $area): Widget
     {
         $lines = Text::parse($this->state->get('update_log', ''));
         $height = $lines->height();

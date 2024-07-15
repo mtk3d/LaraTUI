@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 class MigrationStatus
 {
     public function __construct(
-        public readonly int $pending,
+        public readonly ?int $pending,
         public readonly int $all,
     ) {}
 
@@ -20,8 +20,8 @@ class MigrationStatus
             ->countBy(fn ($line) => Str::endsWith($line, 'Pending') ? 'Pending' : 'Ran');
 
         return new self(
-            $count->get('Pending'),
-            $count->get('Ran') + $count->get('Pending'),
+            $count->get('Pending') ?? 0,
+            $count->get('Ran') + $count->get('Pending') ?? 0,
         );
     }
 }

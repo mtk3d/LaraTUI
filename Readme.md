@@ -2,7 +2,7 @@
 
 LaraTUI is terminal user interface for laravel local environment
 
-![Interface](./assets/interface.png)
+![Interface](./assets/interface.gif)
 
 Project state is something around PoC and pre-Alpha. Some parts are mocked, it's flaky, and it needs refactoring and more tests.
 
@@ -23,14 +23,14 @@ Project state is something around PoC and pre-Alpha. Some parts are mocked, it's
 - [x] start using php-tui events reading
 - [x] PHP and Composer versions check
 - [x] check migration status
+- [x] logs view
+- [x] running artisan commands
 - [ ] achieve 70% tests coverage
 - [ ] add more info about versions updating
 - [ ] LaraTUI config to keep status of all projects
 - [ ] update packages functionality
 - [ ] automatic help popup on `?`
 - [ ] envs view
-- [ ] logs view
-- [ ] running artisan commands with quick commands
 - [ ] support other envs than laravel sail like laradock or vault
 - [ ] implement project creating window
 - [ ] prepare phar and allow to install using composer

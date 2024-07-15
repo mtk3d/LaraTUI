@@ -27,8 +27,8 @@ describe('test event bus', function () {
 
         $this->eventBus->emit(CharKeyEvent::new('k'), ['some_data']);
 
-        expect($firstCalledWith)->toBe(['some_data']);
-        expect($secondCalledWith)->toBe(['some_data']);
+        expect($firstCalledWith)->toBe(['modifiers' => 0, 'some_data']);
+        expect($secondCalledWith)->toBe(['modifiers' => 0, 'some_data']);
     });
 
     test('can pass key code event to handlers', function () {

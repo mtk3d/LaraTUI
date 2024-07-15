@@ -12,7 +12,10 @@ class MigrationStatusCommand extends Command
     {
         $systemExec(['./vendor/bin/sail', 'artisan', 'migrate:status'])
             ->then(function ($output) use ($state) {
-                $state->set(MigrationStatus::class, MigrationStatus::fromMigrationStatusCommand($output));
+                $state->set(
+                    MigrationStatus::class,
+                    MigrationStatus::fromMigrationStatusCommand($output)
+                );
             });
     }
 }
