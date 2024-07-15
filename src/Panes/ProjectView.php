@@ -2,11 +2,13 @@
 
 namespace LaraTui\Panes;
 
+use LaraTui\CommandAttributes\Mouse;
 use LaraTui\PaneTabs\ProjectArtisan;
 use LaraTui\PaneTabs\ProjectCondition;
 use LaraTui\PaneTabs\ProjectEnvs;
 use LaraTui\PaneTabs\ProjectLogs;
 use LaraTui\Traits\TabManager;
+use PhpTui\Term\MouseEventKind;
 use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Style\Style;
@@ -71,6 +73,54 @@ class ProjectView extends Pane
         }
 
         return $titlesObjs;
+    }
+
+    #[Mouse(true)]
+    public function clickOnItem(array $data): void
+    {
+        if (! $this->area) {
+            return;
+        }
+
+        $event = $data['event'];
+
+        if ($event->kind !== MouseEventKind::Down) {
+            return;
+        }
+
+        if ($event->row !== $this->area->top()) {
+            return;
+        }
+
+        $i = $this->getTabFromLeftSide($event->column);
+
+        if (null === $i) {
+            return;
+        }
+
+        $this->currentTab = $i;
+        $this->setTab($i);
+    }
+
+    private function getTabFromLeftSide(int $left): ?int
+    {
+        $clickInWindow = $left - $this->area->left();
+        if ($clickInWindow < 0) {
+            return null;
+        }
+
+        $fromLeft = 2;
+        $item = 0;
+        foreach ($this->tabs as $line) {
+            $fromLeft += $line->width();
+            if ($fromLeft > $clickInWindow) {
+                return $item;
+            }
+            $fromLeft++;
+            $item++;
+        }
+
+        return min(max($item, 3), 0);
     }
 
     public function render(Area $area): Widget

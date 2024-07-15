@@ -12,6 +12,7 @@ use PhpTui\Term\Event\CodedKeyEvent;
 use PhpTui\Term\Event\MouseEvent;
 use PhpTui\Term\EventParser;
 use PhpTui\Term\KeyCode;
+use PhpTui\Term\MouseEventKind;
 use PhpTui\Term\Terminal;
 use PhpTui\Tui\Display\Display;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
@@ -96,7 +97,11 @@ class Application
             foreach ($this->eventParser->drain() as $event) {
                 if (in_array($event::class, [CharKeyEvent::class, CodedKeyEvent::class, MouseEvent::class])) {
                     if ($event instanceof MouseEvent && $this->typingMode) {
-                        continue;
+                        if ($event->kind === MouseEventKind::Down) {
+                            $this->eventBus->emit('typing_mode', ['state' => false]);
+                        } else {
+                            continue;
+                        }
                     }
 
                     if ($this->typingMode && $event instanceof CharKeyEvent) {

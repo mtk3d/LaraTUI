@@ -15,6 +15,8 @@ use PhpTui\Tui\Extension\Core\Widget\ListWidget;
 use PhpTui\Tui\Extension\Core\Widget\Scrollbar\ScrollbarOrientation;
 use PhpTui\Tui\Extension\Core\Widget\Scrollbar\ScrollbarState;
 use PhpTui\Tui\Extension\Core\Widget\ScrollbarWidget;
+use PhpTui\Tui\Text\Line;
+use PhpTui\Tui\Text\Text;
 use PhpTui\Tui\Widget\Corner;
 use PhpTui\Tui\Widget\Widget;
 
@@ -86,18 +88,22 @@ class ProjectLogs extends Component
         $logs = $this->state->get('app_log', '');
         $items = explode(PHP_EOL, $logs);
         $listItems = array_map(
-            fn (string $line): ListItem => ListItem::fromString($line),
+            function (string $line) use ($area): ListItem {
+                $lines = explode(PHP_EOL, wordwrap($line, $area->width - 3, PHP_EOL, true));
+                $lines = array_map([Line::class, 'fromString'], $lines);
+                return ListItem::new(Text::fromLines(...$lines));
+            },
             array_reverse($items),
         );
 
-        $viewportHeight = $this->display->viewportArea()->height;
+        $viewportHeight = $area->height;
 
-        $itemsCount = count($listItems);
-        if ($this->offset + $viewportHeight > $itemsCount) {
-            $this->offset = $itemsCount - $viewportHeight;
+        $linesCount = count($listItems);
+        if ($this->offset + $viewportHeight > $linesCount) {
+            $this->offset = $linesCount - $viewportHeight;
         }
 
-        $scrollContentLength = $itemsCount - $viewportHeight;
+        $scrollContentLength = $linesCount - $viewportHeight;
 
         return CompositeWidget::fromWidgets(
             ListWidget::default()
