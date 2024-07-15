@@ -24,7 +24,6 @@ use PhpTui\Tui\Widget\Corner;
 use PhpTui\Tui\Widget\Direction;
 use PhpTui\Tui\Widget\Widget;
 
-/** @package LaraTui\PaneTabs */
 class ProjectArtisan extends Component
 {
     private bool $typing = false;
@@ -83,7 +82,7 @@ class ProjectArtisan extends Component
     public function cursor(): void
     {
         if ($this->typing) {
-            $this->cursorVisible = !$this->cursorVisible;
+            $this->cursorVisible = ! $this->cursorVisible;
         }
     }
 
@@ -106,7 +105,7 @@ class ProjectArtisan extends Component
         $logs = $this->state->get('artisan_command', '');
         $items = explode(PHP_EOL, $logs);
         $listItems = array_map(
-            fn (string $line): ListItem => ListItem::fromString($line), 
+            fn (string $line): ListItem => ListItem::fromString($line),
             array_reverse($items),
         );
 

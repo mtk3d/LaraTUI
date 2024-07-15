@@ -3,8 +3,6 @@
 namespace LaraTui\Windows;
 
 use LaraTui\Component;
-use PhpTui\Tui\Display\Area;
-use PhpTui\Tui\Widget\Widget;
 
 abstract class Window extends Component
 {

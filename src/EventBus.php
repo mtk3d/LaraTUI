@@ -52,7 +52,7 @@ class EventBus
         }
 
         if ($event instanceof MouseEvent) {
-            $key = "Mouse";
+            $key = 'Mouse';
             $data = [
                 'event' => $event,
             ];

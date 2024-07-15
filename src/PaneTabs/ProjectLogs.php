@@ -56,6 +56,7 @@ class ProjectLogs extends Component
         $half = $this->halfScreen();
         if ($this->offset - $half > 0) {
             $this->offset -= $this->halfScreen();
+
             return;
         }
 
@@ -85,7 +86,7 @@ class ProjectLogs extends Component
         $logs = $this->state->get('app_log', '');
         $items = explode(PHP_EOL, $logs);
         $listItems = array_map(
-            fn (string $line): ListItem => ListItem::fromString($line), 
+            fn (string $line): ListItem => ListItem::fromString($line),
             array_reverse($items),
         );
 

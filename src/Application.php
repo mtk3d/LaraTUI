@@ -95,17 +95,19 @@ class Application
 
             foreach ($this->eventParser->drain() as $event) {
                 if (in_array($event::class, [CharKeyEvent::class, CodedKeyEvent::class, MouseEvent::class])) {
-                    if ($event instanceof MouseEvent && $this->typingMode){
+                    if ($event instanceof MouseEvent && $this->typingMode) {
                         continue;
                     }
 
                     if ($this->typingMode && $event instanceof CharKeyEvent) {
                         $this->eventBus->emit('input', ['data' => $data]);
+
                         return;
                     }
 
                     if ($this->typingMode && $event->code === KeyCode::Esc) {
                         $this->eventBus->emit('typing_mode', ['state' => false]);
+
                         return;
                     }
 
