@@ -114,7 +114,7 @@ class Services extends Pane
     #[Mouse()]
     public function click(array $data): void
     {
-        if (!isset($this->area)) {
+        if (! isset($this->area)) {
             return;
         }
 

@@ -94,7 +94,7 @@ class ProjectView extends Pane
 
         $i = $this->getTabFromLeftSide($event->column);
 
-        if (null === $i) {
+        if ($i === null) {
             return;
         }
 

@@ -113,6 +113,7 @@ class ProjectLogs extends Component
             function (string $line) use ($area): array {
                 $lines = explode(PHP_EOL, wordwrap($line, $area->width - 3, PHP_EOL, true));
                 $lines = array_map([ListItem::class, 'fromString'], $lines);
+
                 return $lines;
             },
             array_reverse($items),

@@ -16,7 +16,6 @@ use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Extension\Core\Widget\ParagraphWidget;
 use PhpTui\Tui\Layout\Constraint;
-use PhpTui\Tui\Layout\Layout;
 use PhpTui\Tui\Style\Style;
 use PhpTui\Tui\Text\Line;
 use PhpTui\Tui\Text\Span;

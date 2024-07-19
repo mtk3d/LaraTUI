@@ -27,7 +27,11 @@ abstract class Pane extends Component
             return;
         }
 
-        if ($event->row >= $this->area->top() && $event->row <= $this->area->bottom() && $event->column >= $this->area->left() && $event->column <= $this->area->right()) {
+        if ($event->row > $this->area->top()
+            && $event->row < $this->area->bottom()
+            && $event->column > $this->area->left()
+            && $event->column < $this->area->right()
+        ) {
             $this->activate();
 
             return;

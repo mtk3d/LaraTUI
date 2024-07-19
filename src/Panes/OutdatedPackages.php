@@ -75,7 +75,7 @@ class OutdatedPackages extends Pane
     #[Mouse()]
     public function click(array $data): void
     {
-        if (!isset($this->area)) {
+        if (! isset($this->area)) {
             return;
         }
 
@@ -116,9 +116,7 @@ class OutdatedPackages extends Pane
                                 ->highlightSymbol('')
                                 ->highlightStyle(Style::default()->lightRed())
                                 ->state(new ListState(0, $this->isActive ? $this->selectedItem : null))
-                                ->items(
-                                    ...$this->packages,
-                                )
+                                ->items(...$this->packages)
                     )
                 );
     }

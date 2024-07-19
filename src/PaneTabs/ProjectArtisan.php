@@ -14,8 +14,6 @@ use PhpTui\Term\KeyCode;
 use PhpTui\Term\MouseEventKind;
 use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
-use PhpTui\Tui\Extension\Core\Widget\Buffer\BufferContext;
-use PhpTui\Tui\Extension\Core\Widget\BufferWidget;
 use PhpTui\Tui\Extension\Core\Widget\GridWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
 use PhpTui\Tui\Extension\Core\Widget\ListWidget;
@@ -97,7 +95,7 @@ class ProjectArtisan extends Component
     #[Mouse()]
     public function click(array $data): void
     {
-        if (!isset($this->inputArea)) {
+        if (! isset($this->inputArea)) {
             return;
         }
 
@@ -141,9 +139,9 @@ class ProjectArtisan extends Component
         );
 
         $constraints = [
-                Constraint::length($area->height - 5),
-                Constraint::length(3),
-            ];
+            Constraint::length($area->height - 5),
+            Constraint::length(3),
+        ];
 
         $layout = Layout::default()
             ->direction(Direction::Vertical)
