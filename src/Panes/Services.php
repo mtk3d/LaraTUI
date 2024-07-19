@@ -125,7 +125,11 @@ class Services extends Pane
             return;
         }
 
-        $this->selectedItem = $event->row - $this->area->top() - 1;
+        $clickedPos = $event->row - $this->area->top() - 1;
+
+        if ($clickedPos < count($this->services)) {
+            $this->selectedItem = $clickedPos;
+        }
     }
 
     public function render(Area $area): Widget
