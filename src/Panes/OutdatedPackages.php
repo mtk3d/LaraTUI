@@ -2,10 +2,12 @@
 
 namespace LaraTui\Panes;
 
+use LaraTui\CommandAttributes\Mouse;
 use LaraTui\CommandAttributes\Periodic;
 use LaraTui\Commands\OutdatedPackagesCommand;
 use LaraTui\State\OutdatedPackages as OutdatedPackagesState;
 use LaraTui\Traits\ListManager;
+use PhpTui\Term\MouseEventKind;
 use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Extension\Core\Widget\BlockWidget;
 use PhpTui\Tui\Extension\Core\Widget\List\ListItem;
@@ -68,6 +70,23 @@ class OutdatedPackages extends Pane
                 );
             }, $outdatedPackages->installed);
         }
+    }
+
+    #[Mouse()]
+    public function click(array $data): void
+    {
+        if (!isset($this->area)) {
+            return;
+        }
+
+        /** @var MouseEvent $event */
+        $event = $data['event'];
+
+        if ($event->kind !== MouseEventKind::Down) {
+            return;
+        }
+
+        $this->selectedItem = $event->row - $this->area->top() - 1;
     }
 
     public function render(Area $area): Widget
