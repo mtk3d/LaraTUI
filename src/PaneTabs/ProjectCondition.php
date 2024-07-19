@@ -104,9 +104,6 @@ class ProjectCondition extends Component
             Constraint::min(2),
             Constraint::min(6),
         ];
-        $layout = Layout::default()
-            ->direction(Direction::Vertical)
-            ->constraints($constraints);
 
         return
             GridWidget::default()

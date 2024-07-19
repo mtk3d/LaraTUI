@@ -3,10 +3,12 @@
 namespace LaraTui\PaneTabs;
 
 use LaraTui\CommandAttributes\KeyPressed;
+use LaraTui\CommandAttributes\Mouse;
 use LaraTui\Commands\TailLogsCommand;
 use LaraTui\Component;
 use PhpTui\Term\KeyCode;
 use PhpTui\Term\KeyModifiers;
+use PhpTui\Term\MouseEventKind;
 use PhpTui\Tui\Display\Area;
 use PhpTui\Tui\Display\Display;
 use PhpTui\Tui\Extension\Core\Widget\CompositeWidget;
@@ -15,14 +17,14 @@ use PhpTui\Tui\Extension\Core\Widget\ListWidget;
 use PhpTui\Tui\Extension\Core\Widget\Scrollbar\ScrollbarOrientation;
 use PhpTui\Tui\Extension\Core\Widget\Scrollbar\ScrollbarState;
 use PhpTui\Tui\Extension\Core\Widget\ScrollbarWidget;
-use PhpTui\Tui\Text\Line;
-use PhpTui\Tui\Text\Text;
 use PhpTui\Tui\Widget\Corner;
 use PhpTui\Tui\Widget\Widget;
 
 class ProjectLogs extends Component
 {
     private Display $display;
+
+    private Area $area;
 
     private int $offset = 0;
 
@@ -76,6 +78,25 @@ class ProjectLogs extends Component
         $this->offset += $half;
     }
 
+    #[Mouse()]
+    public function scroll(array $data): void
+    {
+        if (! isset($this->area)) {
+            return;
+        }
+
+        $event = $data['event'];
+
+        switch ($event->kind) {
+            case MouseEventKind::ScrollUp:
+                $this->offset++;
+                break;
+            case MouseEventKind::ScrollDown:
+                $this->offset--;
+                break;
+        }
+    }
+
     private function halfScreen(): int
     {
         $height = $this->display->viewportArea()->height - 2;
@@ -85,22 +106,29 @@ class ProjectLogs extends Component
 
     public function render(Area $area): Widget
     {
+        $this->area = $area;
         $logs = $this->state->get('app_log', '');
         $items = explode(PHP_EOL, $logs);
         $listItems = array_map(
-            function (string $line) use ($area): ListItem {
+            function (string $line) use ($area): array {
                 $lines = explode(PHP_EOL, wordwrap($line, $area->width - 3, PHP_EOL, true));
-                $lines = array_map([Line::class, 'fromString'], $lines);
-                return ListItem::new(Text::fromLines(...$lines));
+                $lines = array_map([ListItem::class, 'fromString'], $lines);
+                return $lines;
             },
             array_reverse($items),
         );
+
+        $listItems = array_merge(...$listItems);
 
         $viewportHeight = $area->height;
 
         $linesCount = count($listItems);
         if ($this->offset + $viewportHeight > $linesCount) {
             $this->offset = $linesCount - $viewportHeight;
+        }
+
+        if ($this->offset < 0) {
+            $this->offset = 0;
         }
 
         $scrollContentLength = $linesCount - $viewportHeight;

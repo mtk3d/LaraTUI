@@ -10,6 +10,6 @@ class RunArtisanCommand extends Command
 
     public function __invoke(SystemExec $systemExec): void
     {
-        $systemExec(['php', 'artisan', $this->command], 'artisan_command');
+        $systemExec(['./vendor/bin/sail', 'artisan', $this->command], 'artisan_command');
     }
 }
